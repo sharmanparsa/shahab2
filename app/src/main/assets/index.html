@@ -264,7 +264,7 @@ en:{guideOn:"Rostam's guide",padSize:"Button size",small:"Small",big:"Big",lossL
 function T(k){var s=STR[LANG]||STR.fa; return s[k]!==undefined?s[k]:(STR.fa[k]||k)}
 function N(n){n=Math.round(n); return LANG==="fa"?Number(n).toLocaleString("fa-IR",{useGrouping:false}):String(n)}
 var HERO_NAME={arash:["آرش کمانگیر","Arash the Archer"],gord:["گردآفرید","Gordafarid"],sohrab:["سهراب","Sohrab"],siavash:["سیاوش","Siavash"],esfandiyar:["اسفندیار روئین‌تن","Esfandiyar the Brazen-Bodied"]};
-var PAID_OPEN=false; /* تا وقتی false است خریدهای پولی (قهرمان و سکه) قفل‌اند */
+var PAID_OPEN=true; /* تا وقتی false است خریدهای پولی (قهرمان و سکه) قفل‌اند */
 var TG_CHANNEL="SevenKhans"; /* آیدی کانال تلگرام بدون @ */
 var CHAR_IAP=false; /* وقتی خرید واقعیِ بازار وصل شد true شود و window.__IAP.buy(k,cb) را بنویس */
 var CHARS={
@@ -1328,7 +1328,7 @@ function updPlayer(){
   var P=W.P, L=W.L, m=L.mech, prevB;
   if(P.dead){ P.dead++; P.vy+=0.5; P.y+=P.vy; return }
   if(P.fl){ updFlag(); return }
-  if(P.inv>0) P.inv--; if(P.star>0) P.star--; if(P.mr>0) P.mr--;
+  if(P.inv>0) P.inv--; if(P.blink>0) P.blink--; if(P.star>0) P.star--; if(P.mr>0) P.mr--;
   var tgt=(K.left?-1:0)+(K.right?1:0), mx=(K.act||K.rs)?3.7:3.2, fr=(m.fric||1);
   var acc=P.on?Math.max(0.05,0.42*fr):0.3, dec=P.on?Math.max(0.02,0.55*fr):0.06;
   if(tgt){ P.face=tgt;
@@ -1676,7 +1676,7 @@ function render(){
   if(W.boss) drawBossArt(W.boss);
   W.pr.forEach(drawProj);
   /* بازیکن */
-  if(!(P.inv>0&&(frame&4)&&!P.dead)) { cx.globalAlpha=(P.fl>=2)?Math.max(0,Math.min(1,1-(P.x-(W.flagX+84))/42)):1; drawHeroAt(P.x,P.y,P.face,P,heroKey(),P.big); cx.globalAlpha=1 }
+  if(!(P.blink>0&&(frame&4)&&!P.dead)) { cx.globalAlpha=(P.fl>=2)?Math.max(0,Math.min(1,1-(P.x-(W.flagX+84))/42)):1; drawHeroAt(P.x,P.y,P.face,P,heroKey(),P.big); cx.globalAlpha=1 }
   W.pa.forEach(function(p){ cx.globalAlpha=Math.min(1,p.t/12); if(p.c==='#F2D16B'){ cx.fillStyle=p.c; cx.beginPath(); cx.arc(p.x,p.y,p.s/2,0,6.3); cx.fill() } else rect(p.x,p.y,p.s,p.s,p.c); cx.globalAlpha=1 });
   cx.font="bold 10px sans-serif"; cx.textAlign="center"; W.pop.forEach(function(p){ cx.fillStyle="rgba(0,0,0,.6)"; cx.fillText(p.s,px(p.x)+1,px(p.y)+1); cx.fillStyle="#fff"; cx.fillText(p.s,px(p.x),px(p.y)) }); cx.textAlign="left";
   cx.restore();
@@ -2485,7 +2485,7 @@ function setSeen(k){ SAVE.seen=SAVE.seen||{}; SAVE.seen[k]=1; writeSave() }
 function relK(){ K.left=K.right=K.jump=K.act=K.rs=0; KP.jump=KP.act=KP.shoot=0 }
 var CD=null;
 function cancelCount(){ if(CD){ clearTimeout(CD.t); CD=null } var e=$("cd3"); if(e){ e.hidden=true; e.classList.remove("pop") } }
-function startCount(){ cancelCount(); if(state!=="play") return; state="count"; relK(); var e=$("cd3"), n=3; e.hidden=false;
+function startCount(){ cancelCount(); if(state!=="play") return; relK(); if(W&&W.P){ W.P.inv=Math.max(W.P.inv||0,120); W.P.blink=120 } return; var e=$("cd3"), n=3;
   function tick(){ if(state!=="count"){ cancelCount(); return } if(n<=0){ e.hidden=true; e.classList.remove("pop"); CD=null; state="play"; return } e.textContent=N(n); e.classList.remove("pop"); void e.offsetWidth; e.classList.add("pop"); if(window.__sfx) window.__sfx("cp"); n--; CD={t:setTimeout(tick,1000)} }
   tick() }
 window.__cancelCount=cancelCount;
