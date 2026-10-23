@@ -12,9 +12,74 @@ import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.JavascriptInterface;
+import java.util.Arrays;
+import java.util.List;
+import ir.myket.billingclient.IabHelper;
+import ir.myket.billingclient.util.IabResult;
+import ir.myket.billingclient.util.Inventory;
+import ir.myket.billingclient.util.Purchase;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private IabHelper iab;
+    private boolean iabReady = false;
+    private static final List<String> SKUS = Arrays.asList(
+        "hero_sohrab", "hero_siavash", "hero_esfandiyar", "coins_500", "coins_750", "coins_1000");
+
+    private boolean isCoin(String sku) { return sku != null && sku.startsWith("coins_"); }
+
+    private void js(final String code) {
+        runOnUiThread(() -> { if (web != null) web.evaluateJavascript("try{" + code + "}catch(e){}", null); });
+    }
+
+    private void deliver(final Purchase p) {
+        final String sku = p.getSku();
+        if (isCoin(sku)) {
+            iab.consumeAsync(p, (purchase, result) -> {
+                if (result.isSuccess()) js("window.__iapResult('" + sku + "',true)");
+                else js("window.__iapResult('" + sku + "',false)");
+            });
+        } else {
+            js("window.__iapResult('" + sku + "',true)");
+        }
+    }
+
+    private void setupBilling() {
+        try {
+            iab = new IabHelper(this, BuildConfig.IAB_PUBLIC_KEY);
+            iab.startSetup(result -> {
+                if (!result.isSuccess() || iab == null) return;
+                iabReady = true;
+                iab.queryInventoryAsync(true, SKUS, (res, inv) -> {
+                    if (iab == null || res.isFailure() || inv == null) return;
+                    StringBuilder owned = new StringBuilder();
+                    for (String sku : SKUS) {
+                        Purchase p = inv.getPurchase(sku);
+                        if (p == null) continue;
+                        if (isCoin(sku)) deliver(p);
+                        else { if (owned.length() > 0) owned.append(","); owned.append(sku); }
+                    }
+                    if (owned.length() > 0) js("window.__iapOwned('" + owned + "')");
+                });
+            });
+        } catch (Throwable t) { iab = null; }
+    }
+
+    private class Bridge {
+        @JavascriptInterface
+        public void buy(final String sku) {
+            runOnUiThread(() -> {
+                if (iab == null) { js("window.__iapResult('" + sku + "',false)"); return; }
+                try {
+                    iab.launchPurchaseFlow(MainActivity.this, sku, (result, purchase) -> {
+                        if (result.isSuccess() && purchase != null) deliver(purchase);
+                        else js("window.__iapResult('" + sku + "',false)");
+                    });
+                } catch (Throwable t) { js("window.__iapResult('" + sku + "',false)"); }
+            });
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +113,9 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        web.addJavascriptInterface(new Bridge(), "AndroidIAP");
         setContentView(web);
+        setupBilling();
         web.loadUrl("file:///android_asset/index.html");
     }
 
@@ -87,6 +154,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (iab != null) { try { iab.dispose(); } catch (Throwable t) { } iab = null; }
         if (web != null) { web.destroy(); web = null; }
         super.onDestroy();
     }

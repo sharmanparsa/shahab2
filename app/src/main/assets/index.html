@@ -266,7 +266,7 @@ function N(n){n=Math.round(n); return LANG==="fa"?Number(n).toLocaleString("fa-I
 var HERO_NAME={arash:["آرش کمانگیر","Arash the Archer"],gord:["گردآفرید","Gordafarid"],sohrab:["سهراب","Sohrab"],siavash:["سیاوش","Siavash"],esfandiyar:["اسفندیار روئین‌تن","Esfandiyar the Brazen-Bodied"]};
 var PAID_OPEN=true; /* تا وقتی false است خریدهای پولی (قهرمان و سکه) قفل‌اند */
 var TG_CHANNEL="SevenKhans"; /* آیدی کانال تلگرام بدون @ */
-var CHAR_IAP=false; /* وقتی خرید واقعیِ بازار وصل شد true شود و window.__IAP.buy(k,cb) را بنویس */
+var CHAR_IAP=true; /* وقتی خرید واقعیِ بازار وصل شد true شود و window.__IAP.buy(k,cb) را بنویس */
 var CHARS={
  sohrab:{wp:"dagger",l:1,a:5,price:"۱۰ تومان",pe:"10 Toman",d:["پسرِ رستم؛ جوان و پرشور، با خنجرِ تیز. یک جان و پنج خنجر بیشتر.","Rostam's son, young and fiery, with a sharp dagger. +1 life, +5 daggers."],
   r:["سهراب... نامش دلم را می‌لرزاند. او پسرِ من بود؛ پهلوانی که پیش از آنکه بشناسمش از دستم رفت. حالا که او با توست، دلیرانه بجنگ و نامش را زنده نگه دار.","Sohrab... his name stirs my heart. He was my son, a hero I lost before I knew him. Now that he fights beside you, be brave and keep his name alive."]},
@@ -2554,18 +2554,12 @@ window.__gdCard=enemyCard;
 
 /* ---------- آموزش‌های ثابت ---------- */
 function tut(key,steps,opt){ if(!gdOn()||SAVE.tut[key]) return; SAVE.tut[key]=1; writeSave(); setTimeout(function(){ if(!ov.hidden||state==="play") guide(steps,null,opt) },380) }
+var __welcomed=false;
 window.__tutTitle=function(){
-  if(SAVE.tut.title||!gdOn()) return; SAVE.tut.title=1; writeSave();
+  if(__welcomed||!gdOn()) return; __welcomed=true;
   setTimeout(function(){ if(ov.hidden) return; guide([
    {t:["درود بر تو ای جوان! منم رستمِ دستان، پورِ زال، جهان‌پهلوان. به نامِ یزدانِ پاک، به بازیِ «هفت‌خان» خوش آمدی.","Greetings, young one! I am Rostam, son of Zal, the World-Champion. In the name of God, welcome to Haft Khan."]},
-   {t:["بدان که کاووس‌شاه در مازندران به بندِ دیوان گرفتار است و ایران‌زمین چشم به راهِ دلاوری. نخست دکمه‌های این سرا را برایت بازگویم.","King Kavus lies in chains in Mazandaran and Iran waits for a hero. First, let me show you what these buttons do."]},
-   S("[data-act=hero]","«تغییر قهرمان»: میانِ آرشِ کمانگیر و گُردآفرید یکی را برمی‌گزینی. آرش تیر می‌اندازد و گُردآفرید خنجر.","“Change hero”: pick Arash the archer (arrows) or Gordafarid (daggers)."),
-   S("[data-act=gallery]","«گنجینه»: هفت‌سین‌ها و بیت‌های شاهنامه که فراهم می‌آوری اینجا نگه داشته می‌شود.","“Treasury”: the Haft-Sin items and Shahnameh verses you collect are kept here."),
-   S("[data-act=scores]","«امتیازها»: بهترین رزم‌های تو را اینجا می‌بینی.","“Scores”: your best runs."),
-   S("[data-act=settings]","«کنترل»: میانِ دکمه‌ی لمسی و جوی‌استیک برگزین و اندازه‌ی دکمه‌ها را بسنج.","“Controls”: choose buttons or analog stick and set the button size."),
-   S("[data-act=shop]","«فروشگاه»: با سکه‌هایی که می‌اندوزی تیر، خنجر و نوشدارو می‌خری.","“Shop”: spend coins on arrows, daggers and Nushdaru."),
-   S("[data-act=lang]","و این‌جا زبان و صدا را عوض می‌کنی.","Here you change language and sound."),
-   S("[data-act=play]","و این «شروع بازی»! هر دم که آماده شدی بزن؛ آنجا داستان را برایت می‌گویم. اگر به بخش‌های دیگر هم سر بزنی، درونشان راهنمایت می‌شوم.","And this is “Play”! Tap it when ready — I'll tell you the tale there. Visit the other sections and I'll guide you inside them too.",{click:true})
+   {t:["بدان که کاووس‌شاه در مازندران به بندِ دیوان گرفتار است و ایران‌زمین چشم به راهِ دلاوری. هر دکمه‌ای را که بزنی، همان‌جا برایت بازمی‌گویم.","King Kavus lies in chains in Mazandaran and Iran waits for a hero. Tap any button and I will tell you about it right there."]}
   ],null,{key:"t_title"}) },500) };
 window.__tutScreen=function(name){
   var fa=LANG==="fa";
@@ -2612,21 +2606,8 @@ window.__tutPause=function(){ tut("pause",[
   S("[data-act=map]","و این: بازگشت به نقشه. پیشرفتِ این بار از دست می‌رود.","And this: back to the map. This run's progress is lost.",{pad:4})]) };
 window.__gdImp=function(){ tut("imp",[{t:["هشدار ای جوان! این درجه‌ی «ناممکن» است: تله‌ها نهانند و فقط هنگامی که تو نزدیک شوی کار می‌کنند و دشمنان از آن‌ها آسیب نمی‌بینند. زمین هم زیر پایت جابه‌جا می‌شود و تیر و خنجری نیست. به آنچه می‌بینی اعتماد مکن!","Warning, young one! This is Impossible: traps are hidden and wake only when YOU come near — enemies are never hurt by them. The ground shifts and there are no weapons. Trust nothing you see!"]}]) };
 window.__gdLevelStart=function(id){ if(G.diff===3&&SAVE.tut.hud) window.__gdImp();
-  if(!gdOn()||SAVE.tut.hud) return; SAVE.tut.hud=1; writeSave(); var tch=isTouch&&!$("pad").hidden, st=[
-   {t:["اکنون در نخستین مرحله‌ای ای {h}. بگذار همه‌ی نشانه‌های این صفحه را بگویم.","You stand in your first stage, {h}. Let me explain every sign on this screen."],hero:1},
-   S("#lname","نامِ شهر و مرحله.","City and stage name."),
-   S("#hs","«امتیاز»: دشمن بکشی و سکه برداری و ... بالا می‌رود.","“Score”: rises as you defeat enemies and collect things.",{rect:null}),
-   S("#hc","«سکه»: صد سکه یک جان می‌شود و در فروشگاه خرج می‌گردد.","“Coins”: 100 coins make a life, and they spend in the shop."),
-   S("#hn","«سین»: در هر شهر هفت چیزِ سین‌دار پنهان است (سیب، سکه، سبزه، سیر، سماق، سنجد، سرکه). همه را بیابی جانی و پاداشی بزرگ می‌گیری.","“Sin”: seven ‘S’ items are hidden in each city (apple, coin, sabzeh, garlic, sumac, senjed, vinegar). Find all for a life and a big bonus."),
-   S("#hl","«جان»: اگر جانت تمام شود مرحله را از نو می‌روی.","“Lives”: lose them all and the stage restarts."),
-   S("#ha","«تیر» یا «خنجر» (بسته به قهرمانت): شمارِ آنچه برای پرتاب داری. در آسان همه‌جا کار می‌کند؛ در متوسط و سخت فقط در برابر خان؛ در ناممکن هرگز.","“Arrows” or “Daggers” (by your hero): how many you have. Easy: anywhere; Medium/Hard: only against the khan; Impossible: never."),
-   S("#ht","«زمان»: هرچه زودتر به پرچم برسی ستاره‌ی بیشتر می‌گیری.","“Time”: reach the flag faster for more stars."),
-   S("#pause","«مکث»: بازی می‌ایستد؛ از آنجا کنترل و فروشگاه را می‌گشایی، از نو آغاز می‌کنی یا به نقشه برمی‌گردی.","“Pause”: freezes the game; open Controls and Shop, retry, or return to the map.")];
-  if(tch){ if(SAVE.ctl==="stick") st.push(S("#stick","«جوی‌استیک»: به چپ و راست بکش تا راه بروی.","“Stick”: drag left/right to move.")); else { st.push(S(".pb[data-k=left]","«چپ» و «راست»: حرکت.","“Left” and “Right”: move.")) }
-    st.push(S(".pb[data-k=shoot]","«شلیک»: تیر یا خنجر؛ کم‌رنگ باشد یعنی در این درجه هنوز نمی‌شود.","“Shoot”: arrow or dagger; dimmed means not allowed right now.")); st.push(S(".pb[data-k=jump]","«پرش»: بیشتر نگه‌داری، بلندتر می‌پری. بر سرِ دشمن بپر تا بمیرد.","“Jump”: hold longer to jump higher. Jump on an enemy's head to defeat it.")) }
-  else st.push({t:["با کلیدهای ← → (یا A و D) راه می‌روی، با فاصله یا ↑ می‌پری و با X یا J شلیک می‌کنی.","Arrow keys or A/D to move, Space/↑ to jump, X or J to shoot."]});
-  st.push({t:["بس است؛ برو و بشتاب! هر چیزِ تازه که ببینی، همان دم بگویمت.","Enough — go! Whenever you meet something new, I'll tell you."]});
-  guide(st,function(){ if(G.diff===3&&window.__gdImp) window.__gdImp() },{key:"t_hud"}) };
+  if(!gdOn()||SAVE.tut.hud) return; SAVE.tut.hud=1; writeSave();
+  guide([S("#hud","ای {h}، در این نوار بالا همه‌چیز را می‌بینی: «جان»هایت، «زمان»، «سکه»، «امتیاز»، «سین» و شمارِ «تیر» یا «خنجر». هر چه زودتر به پرچم برسی ستاره‌ی بیشتری می‌گیری.","{h}, this top bar shows everything: your lives, time, coins, score, Sin items and arrows/daggers. Reach the flag faster to earn more stars.",{hero:1})],function(){ if(G.diff===3&&window.__gdImp) window.__gdImp() },{key:"t_hud"}) };
 
 /* ---------- کشف چیزهای تازه در حین بازی ---------- */
 var ITT={anar:["انار! هر که بخورد بزرگ و نیرومند می‌شود؛ اگر آسیب ببیند نخست کوچک می‌شود تا نمیرد.","A pomegranate! Eat it to grow big and strong; a hit shrinks you first instead of killing you."],
@@ -4281,6 +4262,20 @@ BGL[7]=[
    [[120,50,24],[260,64,28],[420,44,22],[520,56,26]].forEach(function(r,k){ wrapX(P,r[0],function(x){ lmRock2(g,x,yb,r[1],r[2],"#7C8AA0","#46526A",k+6); g.fillStyle="rgba(255,255,255,.95)"; g.beginPath(); g.ellipse(x-4,yb-r[2]+2,r[1]*0.34,4,0,0,6.283); g.fill() }) });
    g.fillStyle="rgba(255,255,255,.95)"; g.beginPath(); g.moveTo(0,H); for(var x=0;x<=P;x+=4) g.lineTo(x,H-8-4*Math.sin(x/P*6.2832*3)-2*Math.sin(x*0.3)); g.lineTo(P,H); g.closePath(); g.fill() }}
 ];
+
+/* ===== پرداخت مایکت: پل میان بازی و برنامه‌ی اندروید ===== */
+var IAPQ={};
+function iapSku(k){ return "hero_"+k }
+function iapGo(sku,cb){
+  if(window.AndroidIAP&&window.AndroidIAP.buy){ IAPQ[sku]=cb; try{ window.AndroidIAP.buy(sku) }catch(e){ delete IAPQ[sku]; cb(false) } }
+  else cb(true) /* در مرورگر (بدون اندروید) آزمایشی و رایگان */ }
+window.__IAP={ buy:function(k,cb){ iapGo(iapSku(k),cb) }, buyCoins:function(i,cb){ iapGo("coins_"+COINP[i].n,cb) } };
+function iapGrant(sku){
+  if(sku.indexOf("coins_")===0){ SAVE.wallet=(SAVE.wallet||0)+parseInt(sku.slice(6),10) }
+  else if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 }
+  writeSave(); try{ if(!ov.hidden&&state!=="play"&&typeof screenShop==="function"&&document.querySelector(".shopr")) screenShop() }catch(e){} }
+window.__iapResult=function(sku,ok){ var cb=IAPQ[sku]; delete IAPQ[sku]; if(cb) cb(!!ok); else if(ok) iapGrant(sku) };
+window.__iapOwned=function(csv){ String(csv||"").split(",").forEach(function(sku){ if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 } }); writeSave() };
 
 /* پس‌پردازش برای همه‌ی بناها */
 (function(){ var old=lmCanvas; lmCanvas=function(k){ var S=Math.max(3,RSC), key=k+"_"+S; if(LMC[key]) return LMC[key]; var c=document.createElement("canvas"); c.width=LMW*S; c.height=LMH*S; var g=c.getContext("2d"); g.scale(S,S); g.lineCap="round"; g.lineJoin="round"; try{ LMDRAW[k](g); lmFinish(g) }catch(e){ if(window.console) console.log("lm",k,e&&e.message) } LMC[key]=c; return c }; window.__lmCanvas=lmCanvas })();
