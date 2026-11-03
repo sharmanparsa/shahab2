@@ -1189,7 +1189,7 @@ function hurt(){
   var P=W.P; if(P.inv>0||P.star>0||P.dead||P.fl) return;
   if(P.big){ shrink(); P.inv=110; sfx("hurt") } else die();
 }
-function die(){ var P=W.P; if(P.dead) return;
+function die(){ var P=W.P; if(P.dead) return; if(P.blink>0&&P.y<=VH+30) return;
   if(typeof W.lv==="number"){ SAVE.deaths=SAVE.deaths||{}; SAVE.deaths[W.lv]=(SAVE.deaths[W.lv]||0)+1 }
   if(W.boss&&!W.boss.dying&&P.y<VH&&G.lives>1){ G.lives--; if(P.big){ P.y+=18; P.h=28 } P.big=false; P.weap=false; P.vy=0; P.inv=180; P.star=0; sfx("hurt"); banner(T("lostLife")); hud(); return }
   W.dp={x:P.x,y:P.y}; writeSave(); P.dead=1; P.vy=-9; P.vx=0; P.big=false; P.weap=false; P.h=28; sfx("die"); if(window.__musStop) window.__musStop() }
@@ -2196,7 +2196,7 @@ function screenMap(){
   state="menu"; inGameUI(false); window.__musMenu(); curScreen=screenMap; var fa=LANG==="fa", i=fa?0:1, sideM=(mapMode==="side");
   var route=(sideM?SIDE.map(function(q0){ return q0.node }):MAPLL).map(function(p){ var q=proj(p); return q[0].toFixed(1)+","+q[1].toFixed(1) }).join(" ");
   var cur=-1; for(var m=0;m<7;m++) if(sideM?(khanBeat(m)>=1&&!SAVE.done[ID_SIDE+m*4+3]):(mapUnlocked(m)&&!SAVE.done[m*4+3])){ cur=m; break }
-  var h='<div class="box" style="max-width:none;width:100%;gap:4px"><h3>'+T("map")+' — <span style="color:var(--muted)">'+heroName()+'</span></h3><div class="row" style="gap:6px"><button class="btn sm'+(sideM?" ghost":"")+'" data-act="mapm" data-mm="main">'+FE("هفت‌خان","Haft Khan")+'</button><button class="btn sm'+(sideM?"":" ghost")+'" data-act="mapm" data-mm="side">'+FE("داستان‌های شاهنامه","Shahnameh Tales")+'</button></div><div class="mapbox"><div class="mapwrap"><svg viewBox="0 0 400 355" aria-hidden="true">'+
+  var h='<div class="box" style="max-width:none;width:100%;gap:4px"><h3>'+T("map")+' — <span style="color:var(--muted)">'+heroName()+'</span></h3><div class="row" style="gap:6px"><button class="btn sm'+(sideM?" ghost":"")+'" data-act="mapm" data-mm="main">'+FE("هفت‌خان","Haft Khan")+'</button><button class="btn sm'+(sideM?"":" ghost")+'" data-act="mapm" data-mm="side">'+FE("داستان‌های شاهنامه","Shahnameh Tales")+'</button></div>'+(sideM?sideNote():'')+'<div class="mapbox"><div class="mapwrap"><svg viewBox="0 0 400 355" aria-hidden="true">'+
    '<defs><linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9D9B0"/><stop offset="1" stop-color="#C9A86A"/></linearGradient><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5BB8D8"/><stop offset="1" stop-color="#2A86AE"/></linearGradient></defs>'+
    '<rect width="400" height="355" fill="#E7D6A8"/>'+'<path d="'+smoothD(CASPIAN)+'" fill="url(#gs)" stroke="#2A6E92" stroke-width="1.2"/><path d="'+smoothD(GULF)+'" fill="url(#gs)" stroke="#2A6E92" stroke-width="1.2"/>'+
    '<path d="'+smoothD(IRAN)+'" fill="#000" opacity=".22" transform="translate(3,4)"/><path d="'+smoothD(IRAN)+'" fill="url(#gl)" stroke="#7A5A2E" stroke-width="2.2" stroke-linejoin="round"/>'+
@@ -2207,12 +2207,12 @@ function screenMap(){
    '<text x="'+proj([51.6,39.7])[0]+'" y="'+proj([51.6,39.7])[1]+'" font-size="9" fill="#fff" text-anchor="middle" opacity=".9">'+(fa?"دریای خزر":"Caspian Sea")+'</text>'+
    '<text x="'+proj([54.5,24.9])[0]+'" y="'+proj([54.5,24.9])[1]+'" font-size="9" fill="#fff" text-anchor="middle" opacity=".9">'+(fa?"خلیج فارس":"Persian Gulf")+'</text></svg>';
   if(sideM) for(m=0;m<7;m++){ var sdn=!!SAVE.done[ID_SIDE+m*4+3], qs=proj(SIDE[m].node), ops=khanBeat(m)>=1, cs="node"+(sdn?" done":(m===cur?" cur":"")), xs=qs[0]/400*100, ys=qs[1]/355*100;
-    h+='<button class="'+cs+'" style="left:'+xs+'%;top:'+ys+'%" data-act="scity" data-i="'+m+'" '+(ops?"":"disabled")+'>'+(ops?N(m+1):"🔒")+'</button><span class="nlabel '+SIDE[m].lab+'" style="left:'+xs+'%;top:'+ys+'%"><b>'+SIDE[m].n[i]+'</b><small>'+SIDE[m].title[i]+'</small></span>' }
+    h+='<button class="'+cs+'" style="left:'+xs+'%;top:'+ys+'%" data-act="scity" data-i="'+m+'" '+(ops?"":"disabled")+'>'+(ops?(sideOwned(m)?N(m+1):"💰"):"🔒")+'</button><span class="nlabel '+SIDE[m].lab+'" style="left:'+xs+'%;top:'+ys+'%"><b>'+SIDE[m].n[i]+'</b><small>'+SIDE[m].title[i]+'</small></span>' }
   else for(m=0;m<7;m++){ var done=!!SAVE.done[m*4+3], q=proj(MAPLL[m]), cls="node"+(done?" done":(m===cur?" cur":"")), xp=q[0]/400*100, yp=q[1]/355*100, sd=MAPSIDE[m];
     h+='<button class="'+cls+'" style="left:'+xp+'%;top:'+yp+'%" data-act="city" data-i="'+m+'" '+(mapUnlocked(m)?"":"disabled")+'>'+N(m+1)+'</button><span class="nlabel '+sd+'" style="left:'+xp+'%;top:'+yp+'%"><b>'+MAPS[m].n[i]+'</b><small>'+KHAN[m].t[i]+': '+KHAN[m].n[i]+'</small></span>' }
   h+='</div><div class="lg">';
   if(sideM) for(m=0;m<7;m++){ var st3=0; for(var s3=0;s3<4;s3++) if(SAVE.done[ID_SIDE+m*4+s3]) st3++; var op3=khanBeat(m)>=1;
-    h+='<button class="btn sm stg'+(m===cur?"":" ghost")+'" data-act="scity" data-i="'+m+'" '+(op3?"":"disabled")+'><span>'+N(m+1)+'. '+SIDE[m].n[i]+'</span><span>'+(op3?N(st3)+'/'+N(4):"🔒")+'</span></button>' }
+    h+='<button class="btn sm stg'+(m===cur?"":" ghost")+'" data-act="scity" data-i="'+m+'" '+(op3?"":"disabled")+'><span>'+N(m+1)+'. '+SIDE[m].n[i]+'</span><span>'+(op3?(sideOwned(m)?N(st3)+'/'+N(4):sideTag(m)):"🔒")+'</span></button>' }
   else for(m=0;m<7;m++){ var st=0; for(var s=0;s<4;s++) if(SAVE.done[m*4+s]) st++;
     h+='<button class="btn sm stg'+(m===cur?"":" ghost")+'" data-act="city" data-i="'+m+'" '+(mapUnlocked(m)?"":"disabled")+'><span>'+N(m+1)+'. '+MAPS[m].n[i]+'</span><span>'+(mapUnlocked(m)?N(st)+'/'+N(4):"🔒")+'</span></button>' }
   h+='</div></div>';
@@ -2440,7 +2440,7 @@ ov.addEventListener("click",function(e){
   else if(a==="title") screenTitle(); else if(a==="map") screenMap(); else if(a==="lang") toggleLang(); else if(a==="snd"){ toggleMute(); screenTitle() }
   else if(a==="pickhero"){ SAVE.hero=h; writeSave(); goMap() }
   else if(a==="level"){ var n=i==="custom"?i:parseInt(i,10); startLevel(n,G.diff) }
-  else if(a==="city") screenStages(parseInt(i,10)); else if(a==="scity") screenSideStages(parseInt(i,10)); else if(a==="mapm"){ mapMode=t.getAttribute("data-mm"); screenMap() } else if(a==="info"){ selDiff=0; screenInfo(parseInt(i,10)) }
+  else if(a==="city") screenStages(parseInt(i,10)); else if(a==="scity"){ var sm=parseInt(i,10); if(sideOwned(sm)) screenSideStages(sm); else screenSidePay(sm) } else if(a==="sidebuy") sideBuy(parseInt(i,10)); else if(a==="mapm"){ mapMode=t.getAttribute("data-mm"); screenMap() } else if(a==="info"){ selDiff=0; screenInfo(parseInt(i,10)) }
   else if(a==="diff"){ selDiff=parseInt(t.getAttribute("data-d"),10); if(curScreen) curScreen() }
   else if(a==="go") startLevel(parseInt(i,10),selDiff)
   else if(a==="resume") resume(); else if(a==="restart"){ var l=W.lv; startLevel(l,G.diff) }
@@ -4220,13 +4220,16 @@ BGL[3]=[
 /* ---------------- الموت ---------------- */
 BGL[4]=[
  {id:"far",par:0.08,P:760,H:230,fn:function(g,P,H){ lmRange(g,P,H,61,124,46,"#5A3A4E","#A0624A"); lmRange(g,P,H,62,66,22,"#4A2E44","#8A5048"); lmFog(g,P,H-100,100,0.45,"255,150,90") }},
- {id:"mid",par:0.36,P:760,H:236,fn:function(g,P,H){ var i,yb=H-4; function crag(x,w,h,s){ var r=lmRnd(s); function path(){ g.beginPath(); g.moveTo(x-w/2,yb); g.lineTo(x-w*0.4,yb-h*0.35); g.lineTo(x-w*0.22,yb-h*0.62); g.lineTo(x-w*0.08,yb-h*0.85); g.lineTo(x,yb-h); g.lineTo(x+w*0.1,yb-h*0.88); g.lineTo(x+w*0.26,yb-h*0.6); g.lineTo(x+w*0.4,yb-h*0.3); g.lineTo(x+w/2,yb); g.closePath() }
-     path(); g.fillStyle=lgr(g,x-w/2,0,x+w/2,0,[[0,"#7A5A58"],[0.5,"#5A4044"],[1,"#2E2028"]]); g.fill(); g.save(); path(); g.clip(); lmTex(g,x-w/2,yb-h,w,h,s,w*h/8,0.45); for(var k=0;k<10;k++){ g.fillStyle="rgba("+(k%2?"20,10,16":"255,200,160")+",0.1)"; g.fillRect(x-w/2,yb-h+k*h/10,w,3) } g.strokeStyle="rgba(20,8,12,.4)"; g.lineWidth=0.9; for(k=0;k<20;k++){ var gx=x-w*0.3+r()*w*0.6; g.beginPath(); g.moveTo(gx,yb-h*(0.2+r()*0.7)); g.lineTo(gx+(r()-0.5)*8,yb); g.stroke() } g.restore() }
+ {id:"mid",par:0.36,P:760,H:236,fn:function(g,P,H){ var i,yb=H-4; var CL="#A8977C", CD="#6E5E4A";
+   function crag(x,w,h,tw,s){ var r=lmRnd(s), R=[[tw/2,h],[tw/2+w*0.08,h*0.86],[tw/2+w*0.18,h*0.6],[w*0.4,h*0.3],[w/2,0]];
+     function path(){ g.beginPath(); g.moveTo(x-w/2,yb); for(var k=R.length-1;k>=0;k--) g.lineTo(x-R[k][0],yb-R[k][1]); for(k=0;k<R.length;k++) g.lineTo(x+R[k][0],yb-R[k][1]); g.closePath() }
+     path(); g.fillStyle=lgr(g,x-w/2,0,x+w/2,0,[[0,"#7A5A58"],[0.5,"#5A4044"],[1,"#2E2028"]]); g.fill(); g.save(); path(); g.clip(); lmTex(g,x-w/2,yb-h,w,h,s,w*h/8,0.45); for(var k=0;k<12;k++){ g.fillStyle="rgba("+(k%2?"20,10,16":"255,200,160")+",0.1)"; g.fillRect(x-w/2,yb-h+k*h/12,w,3) } g.strokeStyle="rgba(20,8,12,.4)"; g.lineWidth=0.9; for(k=0;k<24;k++){ var gx=x-w*0.34+r()*w*0.68; g.beginPath(); g.moveTo(gx,yb-h*(0.15+r()*0.75)); g.lineTo(gx+(r()-0.5)*8,yb); g.stroke() } g.restore();
+     var ty=yb-h, bw=tw-4, C1="#8A7A68", C2="#5A4E42";
+     lmStone(g,x-bw/2,ty-22,bw,24,C1,C2,s+1,5,11); lmMerl2(g,x-bw/2-2,ty-22,bw+4,Math.max(3,Math.round(bw/9)),C1,C2); lmArch2(g,x,ty-2,Math.max(4,bw/8),12,"rgba(255,160,60,.85)");
+     if(bw>=48){ lmStone(g,x-bw*0.3,ty-44,bw*0.6,22,C1,C2,s+2,5,11); lmMerl2(g,x-bw*0.3-1,ty-44,bw*0.6+2,4,C1,C2); lmArch2(g,x,ty-24,4,9,"rgba(255,160,60,.7)") }
+   }
    g.fillStyle="rgba(120,50,50,.2)"; g.fillRect(0,0,P,H);
-   crag(110,110,150,3); crag(360,130,190,5); crag(600,100,140,7);
-   wrapX(P,360,function(x){ lmStone(g,x-26,yb-196,52,24,"#8A7A68","#5A4E42",21,5,11); lmMerl2(g,x-28,yb-196,56,6,"#8A7A68","#5A4E42"); lmStone(g,x-16,yb-216,32,22,"#8A7A68","#5A4E42",22,5,11); lmMerl2(g,x-17,yb-216,34,4,"#8A7A68","#5A4E42"); lmArch2(g,x,yb-196,7,14,"rgba(255,160,60,.85)"); lmArch2(g,x,yb-216,5,10,"rgba(255,160,60,.7)") });
-   wrapX(P,110,function(x){ lmStone(g,x-20,yb-150,40,24,"#8A7A68","#5A4E42",31,5,11); lmMerl2(g,x-22,yb-150,44,5,"#8A7A68","#5A4E42"); lmArch2(g,x,yb-150,6,12,"rgba(255,160,60,.8)") });
-   wrapX(P,600,function(x){ lmStone(g,x-18,yb-140,36,22,"#8A7A68","#5A4E42",41,5,11); lmMerl2(g,x-20,yb-140,40,5,"#8A7A68","#5A4E42") });
+   crag(110,110,150,44,3); crag(360,130,190,56,5); crag(600,100,140,40,7);
    g.fillStyle=lgr(g,0,H-80,0,H,[[0,"rgba(255,120,60,0)"],[1,"rgba(255,120,60,.3)"]]); g.fillRect(0,H-80,P,80) }},
  {id:"near",par:0.72,P:600,H:150,fn:function(g,P,H){ var yb=H, i; [[40,60,34],[160,48,26],[300,80,44],[420,54,30],[540,70,38]].forEach(function(r,k){ wrapX(P,r[0],function(x){ lmRock2(g,x,yb,r[1],r[2],"#6A4E50","#2E2028",k+10) }) });
    [[110],[250],[470]].forEach(function(p,k){ wrapX(P,p[0],function(x){ g.strokeStyle="#2A1A1E"; g.lineWidth=3; g.lineCap="round"; g.beginPath(); g.moveTo(x,yb); g.quadraticCurveTo(x+5,yb-34,x-2,yb-64); g.stroke(); ln(g,x,yb-34,x+16,yb-52,2,"#2A1A1E"); ln(g,x+1,yb-46,x-14,yb-70,2,"#2A1A1E"); ln(g,x-2,yb-64,x+9,yb-84,1.6,"#2A1A1E"); ln(g,x+16,yb-52,x+22,yb-62,1.2,"#2A1A1E") }) });
@@ -4263,19 +4266,141 @@ BGL[7]=[
    g.fillStyle="rgba(255,255,255,.95)"; g.beginPath(); g.moveTo(0,H); for(var x=0;x<=P;x+=4) g.lineTo(x,H-8-4*Math.sin(x/P*6.2832*3)-2*Math.sin(x*0.3)); g.lineTo(P,H); g.closePath(); g.fill() }}
 ];
 
+/* ====== بازسازی قلعه‌های زاگرس، شمال و الموت ====== */
+LMDRAW.zagros=function(g){ var i, by=BY, r=lmRnd(41);
+  lmRidge(g,134,100,241,"#9AA6C2","#D2D8E4",true); lmRidge(g,168,58,242,"#7E8CAC","#B8C0D2",true); lmMist(g,140,60,0.4,"235,240,250");
+  lmGround(g,"#E4EAF4","#B8C4DA",37,null);
+  /* تپه‌ی صخره‌ای */
+  function hill(){ g.beginPath(); g.moveTo(14,by+2); g.bezierCurveTo(28,196,50,156,64,128); g.quadraticCurveTo(70,114,86,113); g.lineTo(256,113); g.quadraticCurveTo(272,114,278,128); g.bezierCurveTo(292,156,314,196,328,by+2); g.closePath() }
+  hill(); g.fillStyle=lgr(g,60,0,282,0,[[0,"#8A7A6C"],[0.5,"#6E6054"],[1,"#4A4038"]]); g.fill(); g.save(); hill(); g.clip(); lmTex(g,50,100,240,130,45,1800,0.5); for(i=0;i<14;i++){ g.fillStyle="rgba(255,255,255,"+(0.55+r()*0.3)+")"; g.beginPath(); var sx=40+r()*260, sy=130+r()*80; g.moveTo(sx,sy); g.lineTo(sx+10+r()*14,sy+2); g.lineTo(sx+6+r()*10,sy+5+r()*3); g.lineTo(sx-6,sy+4); g.closePath(); g.fill() } g.strokeStyle="rgba(20,12,4,.35)"; g.lineWidth=0.9; for(i=0;i<30;i++){ var x0=80+r()*180, y0=124+r()*30; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x0+(r()-0.5)*10,y0+30+r()*60); g.stroke() } g.restore();
+  /* پایه‌ی سنگیِ قلعه */ lmStone(g,84,106,176,14,"#8A7A68","#5A4E42",77,4,10); frect(g,82,104,180,3,"#A89C8A"); g.fillStyle="rgba(255,255,255,.85)"; g.fillRect(82,102,180,2);
+  /* قلعه */
+  function bw(x,y,w,h,s,c1,c2){ lmBr(g,x,y,w,h,c1||"#B07A56",c2||"#7E5036",s,4.4,9); }
+  bw(104,70,132,44,401); frect(g,102,66,136,5,"#8E6244"); lmMerl2(g,102,66,136,15,"#A87650","#7E5036"); g.fillStyle="rgba(255,255,255,.9)"; for(i=0;i<15;i++) frect(g,104+i*8.7,60,6,2,"rgba(255,255,255,.9)"); frect(g,102,64,136,2,"rgba(255,255,255,.9)");
+  bw(142,36,56,36,402); frect(g,140,32,60,5,"#8E6244"); lmMerl2(g,140,32,60,7,"#A87650","#7E5036");
+  /* برج‌های گرد */
+  [[100,0],[240,1]].forEach(function(t,k){ var x=t[0]; g.fillStyle=lgr(g,x-12,0,x+12,0,[[0,"#C08862"],[0.5,"#A87650"],[1,"#6A4630"]]); g.fillRect(x-12,52,24,66); for(var q=0;q<12;q++) frect(g,x-12,52+q*5.5,24,0.6,"rgba(50,24,6,.3)"); frect(g,x-14,48,28,5,"#8E6244"); poly(g,[x-14,48,x,24,x+14,48],"#8E4A32"); poly(g,[x-14,48,x,24,x-4,48],"rgba(255,255,255,.8)"); poly(g,[x-10,40,x,24,x+10,40],"rgba(255,255,255,.55)"); ln(g,x,24,x,14,1,"#6A4630"); lmArch2(g,x,94,6,16,"rgba(20,8,2,.85)") });
+  /* پنجره‌ها و ایوان */
+  for(i=0;i<6;i++){ lmArch2(g,118+i*20,112,8,24,"rgba(20,8,2,.85)"); lmArch2(g,118+i*20,112,5,20,"rgba(255,190,100,.5)") } lmArch2(g,170,112,18,38,"#1A0E06"); g.strokeStyle="#D8B070"; g.lineWidth=1; lmArchP(g,170,112,20,40); g.stroke();
+  for(i=0;i<4;i++) lmArch2(g,152+i*12,70,6,16,"rgba(20,8,2,.85)");
+  /* برفِ رو بام و لبه */
+  g.fillStyle="rgba(255,255,255,.92)"; g.beginPath(); g.moveTo(138,32); for(var x=138;x<=202;x+=4) g.lineTo(x,32-Math.abs(Math.sin(x*0.3))*3); g.lineTo(202,32); g.closePath(); g.fill();
+  g.fillStyle="rgba(255,255,255,.7)"; for(i=0;i<8;i++) ell(g,106+i*18,66,6,2,"rgba(255,255,255,.7)");
+  
+  /* درختان کاجِ برفی */
+  function pine(x,h){ frect(g,x-1.2,by-6,2.4,6,"#4A3A28"); for(var k=0;k<5;k++){ var w=(h*0.36)*(1-k*0.16), y=by-6-k*h*0.17; poly(g,[x-w,y,x,y-h*0.3,x+w,y],"#2A5A42"); poly(g,[x-w*0.92,y-1,x,y-h*0.3,x-w*0.1,y-h*0.2],"rgba(255,255,255,.85)"); poly(g,[x+w*0.9,y-1,x,y-h*0.3,x+w*0.1,y-h*0.2],"rgba(210,224,240,.7)") } }
+  [[22,70],[44,54],[300,72],[322,58],[78,44],[270,42],[10,46],[332,48]].forEach(function(p){ pine(p[0],p[1]) });
+  /* برف‌ریزه‌ها و چشمه */
+  g.strokeStyle="rgba(120,170,210,.7)"; g.lineWidth=2; g.beginPath(); g.moveTo(170,by+4); g.quadraticCurveTo(140,by+10,110,by+16); g.moveTo(170,by+4); g.quadraticCurveTo(200,by+10,230,by+16); g.stroke();
+  for(i=0;i<70;i++){ ell(g,r()*340,r()*LMH,0.8,0.8,"rgba(255,255,255,"+(0.4+r()*0.5)+")") }
+  [[96,44],[240,30]].forEach(function(b){ lmBird(g,b[0],b[1],4) }); lmSun(g) };
+
+
+LMDRAW.caspian=function(g){ var i, by=BY, r=lmRnd(61);
+  lmRidge(g,140,90,261,"#5E8A72","#A8C0AE"); lmRidge(g,172,50,262,"#4A7A62","#8EB09A"); lmMist(g,100,90,0.45,"232,242,236");
+  lmGround(g,"#4E7A3E","#2C4C28",41,["#2E6A32","#4E8A3C"]);
+  /* درختانِ دورِ جنگل */
+  for(i=0;i<40;i++){ var tx=r()*340, th=60+r()*46; frect(g,tx-1.4,by-th*0.5,2.8,th*0.5,"rgba(50,36,24,.65)"); ell(g,tx,by-th*0.64,10+r()*7,th*0.34,i%3?"rgba(46,98,56,.75)":"rgba(34,82,46,.75)") }
+  lmMist(g,by-70,50,0.4,"236,244,238");
+  /* قلعه بر تپه‌ای جنگلی */
+  function hill(){ g.beginPath(); g.moveTo(24,by); g.bezierCurveTo(38,198,56,164,68,142); g.quadraticCurveTo(76,128,92,127); g.lineTo(250,127); g.quadraticCurveTo(266,128,274,142); g.bezierCurveTo(286,164,304,198,318,by); g.closePath() }
+  hill(); g.fillStyle=lgr(g,50,0,290,0,[[0,"#4A6A3C"],[0.5,"#3A5A30"],[1,"#26402A"]]); g.fill();
+  function wall(x,y,w,h,s){ lmBr(g,x,y,w,h,"#B2603E","#7A3C26",s,4.2,8.4); frect(g,x-1,y-3,w+2,3,"#8E4A30"); lmMerl2(g,x-1,y-3,w+2,Math.max(2,Math.round(w/9)),"#A25834","#7A3C26") }
+  g.save(); hill(); g.clip(); for(i=0;i<46;i++){ var hx=50+r()*240, hy=130+r()*96; ell(g,hx,hy,9+r()*7,6+r()*4,i%3?"#2E6A38":"#3E7E44"); ell(g,hx-2,hy-2,4,2.6,"rgba(190,230,140,.3)") } g.restore();
+  lmStone(g,88,122,166,14,"#9A5034","#6A3220",78,4,9); frect(g,86,120,170,3,"#8E4A30");
+  wall(104,94,132,32,431); wall(140,60,60,36,432); wall(152,38,36,24,433);
+  [[102,0],[238,1],[134,2],[206,3]].forEach(function(t,k){ var x=t[0], hh=k<2?58:46, ww=k<2?24:20; g.fillStyle=lgr(g,x-ww/2,0,x+ww/2,0,[[0,"#C06E4A"],[0.55,"#9A4C30"],[1,"#5E2A1A"]]); g.fillRect(x-ww/2,126-hh,ww,hh); for(var q=0;q<hh/4.4;q++) frect(g,x-ww/2,126-hh+q*4.4,ww,0.6,"rgba(40,12,0,.3)"); frect(g,x-ww/2-2,126-hh-3,ww+4,4,"#8E4A30"); for(q=0;q<4;q++) frect(g,x-ww/2-1+q*(ww+2)/4,126-hh-8,(ww+2)/4-1.4,5,"#A25834"); poly(g,[x-ww/2-2,126-hh-3,x,126-hh-26,x+ww/2+2,126-hh-3],"#7C3A28"); poly(g,[x-ww/2-2,126-hh-3,x,126-hh-26,x-3,126-hh-3],"rgba(255,220,180,.2)"); lmArch2(g,x,126-hh*0.4,5,13,"rgba(24,8,2,.85)"); lmArch2(g,x,126-hh*0.72,4,10,"rgba(24,8,2,.85)") });
+  for(i=0;i<6;i++) lmArch2(g,120+i*20,126,8,20,"rgba(24,8,2,.85)"); lmArch2(g,170,126,16,32,"#1A0A04"); g.strokeStyle="#D89A70"; g.lineWidth=1; lmArchP(g,170,126,18,34); g.stroke(); lmArch2(g,170,96,6,14,"rgba(24,8,2,.85)"); lmArch2(g,160,62,6,14,"rgba(24,8,2,.85)"); lmArch2(g,180,62,6,14,"rgba(24,8,2,.85)");
+  poly(g,[150,38,170,12,190,38],"#7C3A28"); poly(g,[150,38,170,12,162,38],"rgba(255,220,180,.2)"); ln(g,170,12,170,2,1,"#5E2A1A");
+  
+  /* پله‌ها */
+  g.strokeStyle="rgba(214,196,160,.8)"; g.lineWidth=2; g.beginPath(); g.moveTo(170,by-8); g.lineTo(130,200); g.lineTo(196,176); g.lineTo(134,158); g.lineTo(170,140); g.stroke(); g.strokeStyle="rgba(60,40,14,.4)"; g.lineWidth=0.7; g.stroke();
+  /* درختان جلو (بلوط و ممرز) */
+  function oak(x,h,w,s){ var rr=lmRnd(s); g.strokeStyle="#3A2A1A"; g.lineWidth=Math.max(3,w*0.12); g.lineCap="round"; g.beginPath(); g.moveTo(x,by+4); g.quadraticCurveTo(x+(rr()-0.5)*8,by-h*0.4,x,by-h*0.62); g.stroke(); ln(g,x,by-h*0.5,x-w*0.5,by-h*0.76,3,"#3A2A1A"); ln(g,x,by-h*0.55,x+w*0.5,by-h*0.8,3,"#3A2A1A"); var cols=["#2E6A32","#3C7C3C","#4E8C44","#24582A"]; for(var k=0;k<26;k++){ var a=rr()*TP, d=rr(); ell(g,x+Math.cos(a)*w*d,by-h*0.8+Math.sin(a)*h*0.3*d,w*(0.22+rr()*0.2),h*(0.1+rr()*0.07),cols[k%4]) } for(k=0;k<40;k++){ var a2=rr()*TP, d2=rr(); ell(g,x+Math.cos(a2)*w*d2*0.9-w*0.1,by-h*0.84+Math.sin(a2)*h*0.27*d2,1.8,1.2,"rgba(200,236,140,"+(0.25+rr()*0.3)+")") } }
+  oak(24,120,44,5); oak(318,126,46,7); oak(62,84,28,9); oak(284,82,28,11);
+  /* سرخس و گل */
+  for(i=0;i<40;i++){ var fx=r()*340, fy=by+2+r()*18; for(var q=0;q<5;q++) ln(g,fx,fy,fx+(q-2)*3.4,fy-6-r()*4,0.9,i%2?"#3E8A3A":"#2E7030") }
+  lmFlowers(g,8,332,by+16,6,["#F4F0E8","#E8A4B8","#E8C040"]);
+  /* نور از لابه‌لای مه */
+  g.save(); g.globalCompositeOperation="source-atop"; for(i=0;i<4;i++){ var gg=lgr(g,300-i*50,0,170-i*50,LMH,[[0,"rgba(255,246,200,.09)"],[1,"rgba(255,246,200,0)"]]); g.fillStyle=gg; g.beginPath(); g.moveTo(300-i*50,0); g.lineTo(316-i*50,0); g.lineTo(190-i*50,LMH); g.lineTo(150-i*50,LMH); g.closePath(); g.fill() } g.restore();
+  [[110,44],[250,30]].forEach(function(b){ lmBird(g,b[0],b[1],4) }); lmSun(g) };
+
+/* ---------- الموت: دژ حَسَن صَباح، تراشیده در صخره ---------- */
+LMDRAW.alamut=function(g){ var i, by=BY, r=lmRnd(51);
+  lmRidge(g,150,84,251,"#7C84A0","#B0B4C4"); lmMist(g,120,70,0.42,"226,230,242"); lmRidge(g,190,30,252,"#6C7490","#98A0B0");
+  var P=[[34,by],[50,192],[72,164],[92,138],[112,112],[130,94],[146,76],[156,68],[176,70],[196,64],[216,66],[232,72],[244,88],[262,116],[284,152],[302,188],[318,by]];
+  function cy(x){ for(var k=0;k<P.length-1;k++){ if(x>=P[k][0]&&x<=P[k+1][0]){ var t=(x-P[k][0])/(P[k+1][0]-P[k][0]); return P[k][1]+(P[k+1][1]-P[k][1])*t } } return by }
+  function crag(){ g.beginPath(); g.moveTo(P[0][0],P[0][1]); for(var k=1;k<P.length;k++) g.lineTo(P[k][0],P[k][1]); g.closePath() }
+  crag(); g.fillStyle=lgr(g,34,0,318,0,[[0,"#A09280"],[0.5,"#7E7260"],[1,"#463C32"]]); g.fill(); g.save(); crag(); g.clip(); lmTex(g,34,50,290,190,61,6200,0.5);
+  for(i=0;i<18;i++){ g.fillStyle="rgba("+(i%2?"30,20,10":"255,236,200")+","+(0.1+0.03*(i%3))+")"; g.beginPath(); var yy=60+i*10; g.moveTo(30,yy+20); for(var x=30;x<=324;x+=12) g.lineTo(x,yy+Math.sin(x*0.07+i*1.3)*5+(Math.abs(x-190)*0.2)); g.lineTo(324,yy+34); g.lineTo(30,yy+34); g.closePath(); g.fill() }
+  g.strokeStyle="rgba(24,14,6,.45)"; g.lineWidth=1; for(i=0;i<60;i++){ var x0=70+r()*230, y0=78+r()*70; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x0+(r()-0.5)*10,y0+40+r()*100); g.stroke() }
+  g.fillStyle=lgr(g,34,0,318,0,[[0,"rgba(255,240,206,.22)"],[0.5,"rgba(0,0,0,0)"],[1,"rgba(14,8,2,.55)"]]); g.fillRect(34,50,290,190); g.restore();
+  var CL="#C2AE8A", CD="#8C785A";
+  function bt(x,w,h,s,m){ var yb=cy(x+w/2)+2, y=yb-h; lmStone(g,x,y,w,h,CL,CD,s,4.6,10); g.fillStyle="rgba(0,0,0,.18)"; g.fillRect(x+w*0.62,y,w*0.38,h); frect(g,x-1.5,y-3,w+3,3,"#AA966E"); lmMerl2(g,x-1.5,y-3,w+3,Math.max(2,Math.round(w/7)),"#B8A47E",CD);
+    if(m!==0){ for(var q=0;q<Math.max(1,Math.floor(w/14));q++){ var ax=x+8+q*(w-10)/Math.max(1,Math.floor(w/14)); lmArch2(g,ax,y+h*0.55,3,10,"rgba(20,10,2,.9)"); ctxw(g,ax,y+h*0.55) } } return y }
+  function ctxw(g,x,y){ g.fillStyle="rgba(255,170,70,.55)"; g.fillRect(x-1,y-7,2,4) }
+  /* دیوارهای پله‌ای بر دو دامنه */
+  [[100,24,18,431],[124,24,22,432],[142,16,20,433]].forEach(function(w){ bt(w[0],w[1],w[2],w[3],0) });
+  [[232,16,20,434],[246,24,22,435],[270,24,18,436]].forEach(function(w){ bt(w[0],w[1],w[2],w[3],0) });
+  /* دژ اصلی بر قله */
+  bt(160,64,32,421,1); var ty=bt(172,40,24,422,1);
+  lmStone(g,184,ty-16,16,16,CL,CD,423,4,9); frect(g,183,ty-19,18,3,"#AA966E"); lmMerl2(g,183,ty-19,18,3,"#B8A47E",CD); lmArch2(g,192,ty-4,3,9,"rgba(20,10,2,.9)"); g.fillStyle="rgba(255,170,70,.7)"; g.fillRect(191,ty-11,2,3);
+  /* برج‌های گوشه */
+  [[152,16,44,424],[222,16,40,425]].forEach(function(t){ var x=t[0], yb=cy(x+8)+2, y=yb-t[2]; lmStone(g,x,y,t[1],t[2],CL,CD,t[3],4.6,8); g.fillStyle="rgba(0,0,0,.2)"; g.fillRect(x+t[1]*0.6,y,t[1]*0.4,t[2]); frect(g,x-2,y-3,t[1]+4,3,"#AA966E"); lmMerl2(g,x-2,y-3,t[1]+4,3,"#B8A47E",CD); lmArch2(g,x+t[1]/2,y+t[2]*0.5,3,10,"rgba(20,10,2,.9)") });
+  /* برج‌های دیده‌بانیِ دور */
+  [[112,16,24,426],[258,16,26,427],[88,14,18,428],[282,14,20,429]].forEach(function(t){ var yb=cy(t[0]+t[1]/2)+2; lmStone(g,t[0],yb-t[2],t[1],t[2],CL,CD,t[3],4.4,8); frect(g,t[0]-1.5,yb-t[2]-3,t[1]+3,3,"#AA966E"); lmMerl2(g,t[0]-1.5,yb-t[2]-3,t[1]+3,2,"#B8A47E",CD); lmArch2(g,t[0]+t[1]/2,yb-t[2]*0.4,3,9,"rgba(20,10,2,.9)") });
+  /* پرچم سرخ */
+  ln(g,192,ty-19,192,ty-34,1.2,"#5A4636"); poly(g,[192,ty-34,206,ty-30,192,ty-26],"#B2282E");
+  /* تخته‌سنگ‌هایی که پایه‌ی دیوارها را در صخره فرو می‌برند */
+  function rk(x,w,h,s){ var y=cy(x+w/2)+3, q=lmRnd(s); g.fillStyle=lgr(g,x,0,x+w,0,[[0,"#8C7E6A"],[1,"#4E4438"]]); g.beginPath(); g.moveTo(x,y+4); g.lineTo(x+w*0.12,y-h*0.5); g.lineTo(x+w*0.4,y-h); g.lineTo(x+w*0.7,y-h*0.7); g.lineTo(x+w*0.92,y-h*0.35); g.lineTo(x+w,y+4); g.closePath(); g.fill(); g.fillStyle="rgba(255,236,200,.15)"; g.beginPath(); g.moveTo(x+w*0.12,y-h*0.5); g.lineTo(x+w*0.4,y-h); g.lineTo(x+w*0.46,y-h*0.55); g.closePath(); g.fill() }
+  for(i=0;i<16;i++){ rk(96+i*13.4,12+r()*8,5+r()*5,500+i) }
+  /* پلکان زیگزاگی کنده‌شده در صخره با دروازه */
+  lmStone(g,100,cy(108)-10,16,14,CL,CD,440,4,8); lmArch2(g,108,cy(108)+4,5,11,"#140A04");
+  g.strokeStyle="rgba(222,206,170,.9)"; g.lineWidth=2; g.beginPath(); g.moveTo(108,cy(108)+4); g.lineTo(92,146); g.lineTo(112,162); g.lineTo(84,180); g.lineTo(108,198); g.lineTo(90,by-6); g.stroke(); g.strokeStyle="rgba(60,40,16,.5)"; g.lineWidth=0.7; g.stroke();
+  /* مشعل‌ها */
+  [[100,cy(104)-14],[270,cy(274)-18],[206,ty-4]].forEach(function(p){ g.fillStyle=rgr(g,p[0],p[1],0,12,[[0,"rgba(255,170,70,.7)"],[1,"rgba(255,170,70,0)"]]); g.fillRect(p[0]-12,p[1]-12,24,24); ell(g,p[0],p[1],1.6,2.6,"#FFB040") });
+  /* برف روی قله‌ی سنگی */
+  g.fillStyle="rgba(244,246,250,.85)"; g.beginPath(); g.moveTo(156,68); g.lineTo(166,64); g.lineTo(158,72); g.closePath(); g.fill();
+  /* دره‌ی مه‌آلود و جنگل کاج */
+  lmMist(g,by-50,60,0.5,"230,234,244"); lmGround(g,"#7C8670","#4A5440",39,["#4E6A44","#3A5A38"]);
+  function conif(x,h,c){ frect(g,x-1,by-4,2,4,"#3A2A18"); for(var k=0;k<4;k++){ var w=h*0.3*(1-k*0.2), y=by-4-k*h*0.22; poly(g,[x-w,y,x,y-h*0.34,x+w,y],c) } }
+  for(i=0;i<22;i++){ var px=10+i*15+r()*6; conif(px,34+r()*28,i%3?"#2E5A38":"#24482E") }
+  for(i=0;i<5;i++){ lmPlane(g,30+i*70,by+3,46+r()*10,18,i+9) }
+  g.fillStyle=lgr(g,0,by+4,0,LMH,[[0,"#7AB4CE"],[1,"#3A7A9E"]]); g.beginPath(); g.moveTo(130,LMH); g.quadraticCurveTo(160,by+10,190,by+6); g.quadraticCurveTo(220,by+10,250,LMH); g.closePath(); g.fill();
+  [[84,36],[250,24],[280,44]].forEach(function(b){ lmBird(g,b[0],b[1],4) }); lmSun(g) };
+
 /* ===== پرداخت مایکت: پل میان بازی و برنامه‌ی اندروید ===== */
 var IAPQ={};
 function iapSku(k){ return "hero_"+k }
 function iapGo(sku,cb){
   if(window.AndroidIAP&&window.AndroidIAP.buy){ IAPQ[sku]=cb; try{ window.AndroidIAP.buy(sku) }catch(e){ delete IAPQ[sku]; cb(false) } }
   else cb(true) /* در مرورگر (بدون اندروید) آزمایشی و رایگان */ }
-window.__IAP={ buy:function(k,cb){ iapGo(iapSku(k),cb) }, buyCoins:function(i,cb){ iapGo("coins_"+COINP[i].n,cb) } };
+window.__IAP={ buySide:function(p,cb){ iapGo("side_"+(p+1),cb) }, buy:function(k,cb){ iapGo(iapSku(k),cb) }, buyCoins:function(i,cb){ iapGo("coins_"+COINP[i].n,cb) } };
 function iapGrant(sku){
   if(sku.indexOf("coins_")===0){ SAVE.wallet=(SAVE.wallet||0)+parseInt(sku.slice(6),10) }
+  else if(sku.indexOf("side_")===0){ SAVE.side=SAVE.side||{}; SAVE.side[parseInt(sku.slice(5),10)-1]=1 }
   else if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 }
   writeSave(); try{ if(!ov.hidden&&state!=="play"&&typeof screenShop==="function"&&document.querySelector(".shopr")) screenShop() }catch(e){} }
 window.__iapResult=function(sku,ok){ var cb=IAPQ[sku]; delete IAPQ[sku]; if(cb) cb(!!ok); else if(ok) iapGrant(sku) };
-window.__iapOwned=function(csv){ String(csv||"").split(",").forEach(function(sku){ if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 } }); writeSave() };
+window.__iapOwned=function(csv){ String(csv||"").split(",").forEach(function(sku){ if(sku.indexOf("side_")===0){ SAVE.side=SAVE.side||{}; SAVE.side[parseInt(sku.slice(5),10)-1]=1 } if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 } }); writeSave() };
+
+/* ===== شهرهای فرعی: ۱، ۳، ۵ و ۷ پولی؛ ۲، ۴ و ۶ با خریدِ شهرِ پیش از خود رایگان ===== */
+function sidePaidOf(m){ return (m%2===0)?m:m-1 }
+function sideOwned(m){ return !!(SAVE.side&&SAVE.side[sidePaidOf(m)]) }
+function sideTag(m){ return (m%2===0)?FE("۵۰٬۰۰۰ تومان","50,000 T"):FE("🎁 رایگان","🎁 Free") }
+function sideNote(){ return '<div class="sub" style="font-size:12px;margin:0">'+FE("شهرهای ۱، ۳، ۵ و ۷ پولی‌اند (هرکدام ۵۰٬۰۰۰ تومان)؛ با خریدِ هر کدام، شهرِ بعدی‌اش رایگان بازی می‌شود.","Cities 1, 3, 5 and 7 are paid (50,000 Toman each). Buy one and the next city is free to play.")+'</div>' }
+function screenSidePay(m){
+  var p=sidePaidOf(m), fa=LANG==="fa", i=fa?0:1, nx=SIDE[p+1], h='<div class="box"><h3>'+FE("بازکردنِ شهر: ","Unlock: ")+SIDE[p].n[i]+'</h3>'+
+   '<div class="sub">'+FE("این شهر از «داستان‌های شاهنامه» پولی است: ۵۰٬۰۰۰ تومان.","This city of the Shahnameh Tales is paid: 50,000 Toman.")+'</div>'+
+   (nx?'<div class="sub"><b>'+FE("با خریدِ این شهر، شهرِ بعدی («"+nx.n[0]+"») رایگان بازی می‌شود.","Buy this city and the next one (“"+nx.n[1]+"”) is free to play.")+'</b></div>':'')+
+   '<div class="row" style="margin-top:8px">'+B("sidebuy",FE("خرید — ۵۰٬۰۰۰ تومان","Buy — 50,000 Toman"),"",'data-i="'+p+'"')+B("map",T("back"),"ghost sm")+'</div></div>';
+  showOv(h) }
+function sideBuy(p){
+  window.__IAP.buySide(p,function(ok){ if(ok){ SAVE.side=SAVE.side||{}; SAVE.side[p]=1; writeSave(); screenSideStages(p) } else screenSidePay(p) }) }
+
+/* ===== راهنمای رستم: فقط چیزهایی که از نامشان معلوم نیست ===== */
+window.__tutInfo=function(){}; window.__tutPause=function(){}; window.__gdImp=function(){};
+var __ts0=window.__tutScreen; window.__tutScreen=function(n){ if(n==="scores"||n==="hero"||n==="controls") return; if(__ts0) __ts0(n) };
 
 /* پس‌پردازش برای همه‌ی بناها */
 (function(){ var old=lmCanvas; lmCanvas=function(k){ var S=Math.max(3,RSC), key=k+"_"+S; if(LMC[key]) return LMC[key]; var c=document.createElement("canvas"); c.width=LMW*S; c.height=LMH*S; var g=c.getContext("2d"); g.scale(S,S); g.lineCap="round"; g.lineJoin="round"; try{ LMDRAW[k](g); lmFinish(g) }catch(e){ if(window.console) console.log("lm",k,e&&e.message) } LMC[key]=c; return c }; window.__lmCanvas=lmCanvas })();

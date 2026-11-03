@@ -25,7 +25,8 @@ public class MainActivity extends Activity {
     private IabHelper iab;
     private boolean iabReady = false;
     private static final List<String> SKUS = Arrays.asList(
-        "hero_sohrab", "hero_siavash", "hero_esfandiyar", "coins_500", "coins_750", "coins_1000");
+        "hero_sohrab", "hero_siavash", "hero_esfandiyar", "coins_500", "coins_750", "coins_1000",
+        "side_1", "side_3", "side_5", "side_7");
 
     private boolean isCoin(String sku) { return sku != null && sku.startsWith("coins_"); }
 
