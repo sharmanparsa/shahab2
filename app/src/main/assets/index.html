@@ -268,11 +268,11 @@ var PAID_OPEN=true; /* تا وقتی false است خریدهای پولی (قه�
 var TG_CHANNEL="SevenKhans"; /* آیدی کانال تلگرام بدون @ */
 var CHAR_IAP=true; /* وقتی خرید واقعیِ بازار وصل شد true شود و window.__IAP.buy(k,cb) را بنویس */
 var CHARS={
- sohrab:{wp:"dagger",l:1,a:5,price:"۱۰ تومان",pe:"10 Toman",d:["پسرِ رستم؛ جوان و پرشور، با خنجرِ تیز. یک جان و پنج خنجر بیشتر.","Rostam's son, young and fiery, with a sharp dagger. +1 life, +5 daggers."],
+ sohrab:{wp:"dagger",l:1,a:5,price:"۲۰٬۰۰۰ تومان",pe:"20,000 Toman",d:["پسرِ رستم؛ جوان و پرشور، با خنجرِ تیز. یک جان و پنج خنجر بیشتر.","Rostam's son, young and fiery, with a sharp dagger. +1 life, +5 daggers."],
   r:["سهراب... نامش دلم را می‌لرزاند. او پسرِ من بود؛ پهلوانی که پیش از آنکه بشناسمش از دستم رفت. حالا که او با توست، دلیرانه بجنگ و نامش را زنده نگه دار.","Sohrab... his name stirs my heart. He was my son, a hero I lost before I knew him. Now that he fights beside you, be brave and keep his name alive."]},
- siavash:{wp:"bow",l:2,a:10,price:"۳۵ تومان",pe:"35 Toman",d:["شاهزاده‌ی پاک‌دل؛ کمانگیری استاد. دو جان و ده تیر بیشتر.","The pure-hearted prince, a master archer. +2 lives, +10 arrows."],
+ siavash:{wp:"bow",l:2,a:10,price:"۵۰٬۰۰۰ تومان",pe:"50,000 Toman",d:["شاهزاده‌ی پاک‌دل؛ کمانگیری استاد. دو جان و ده تیر بیشتر.","The pure-hearted prince, a master archer. +2 lives, +10 arrows."],
   r:["سیاوشِ پاک‌دل! کمانی چون او کم دیده‌ام. از آتش هم سربلند بیرون آمد و بی‌گناهی‌اش را نشان داد. تیرهایش راست است و دلش پاک؛ با او راه را با دلگرمی برو.","Pure Siavash! I have seen few bows like his. He walked through fire and proved his innocence. His arrows fly straight and his heart is clean; walk the road with courage beside him."]},
- esfandiyar:{wp:"dagger",l:3,a:15,price:"۶۰ تومان",pe:"60 Toman",d:["روئین‌تن؛ جوشنِ آهنین و دلِ بلند. سه جان و پانزده خنجر بیشتر.","The brazen-bodied prince in iron armour. +3 lives, +15 daggers."],
+ esfandiyar:{wp:"dagger",l:3,a:15,price:"۸۰٬۰۰۰ تومان",pe:"80,000 Toman",d:["روئین‌تن؛ جوشنِ آهنین و دلِ بلند. سه جان و پانزده خنجر بیشتر.","The brazen-bodied prince in iron armour. +3 lives, +15 daggers."],
   r:["اسفندیارِ روئین‌تن! با او روبه‌رو شدم و می‌دانم چه سهمگین است؛ تنی که آهن بر آن کارگر نبود. حالا او پشتیبانِ توست؛ سه جان و پانزده خنجر با خود می‌آورد. قدرش را بدان.","Esfandiyar the Brazen-Bodied! I faced him and I know how formidable he is, a body no iron could cut. Now he stands behind you with three lives and fifteen daggers. Value him."]}
 };
 function isBow(k){ var c=CHARS[k]; return c?c.wp==="bow":k==="arash" }
@@ -2240,13 +2240,13 @@ function screenInfo(id){
   var blurb=sd?(sd.s===3?KHAN[7+sd.m].story[i]:SIDE[sd.m].st[sd.s][i]):o?(o.s===3?KHAN[o.m].story[i]:MAPS[o.m].blurb[i]):(id===ID_GULF?T("gulfN"):T("trial")+" "+N(id-ID_TRIAL+1));
   var h='<div class="box" style="max-width:420px"><h2>'+levelName(id)+'</h2><p>'+blurb+'</p>';
   if(!bonus){ h+='<div class="sub" style="font-size:13px">'+T("diff")+'</div><div class="row">';
-    for(var d=0;d<4;d++) h+='<button class="btn sm'+(d===selDiff?"":" ghost")+'" data-act="diff" data-d="'+d+'" '+(d>u?"disabled":"")+'>'+T("d"+d)+(d>u?" 🔒":"")+'</button>';
+    for(var d=0;d<4;d++) h+='<button class="btn sm'+(d===selDiff?"":" ghost")+'" data-act="diff" data-d="'+d+'" '+(d>u?"disabled":"")+'>'+T("d"+d)+(d>u?" 🔒":(sd&&d===3&&!sideImpOwned(sd.m)?" 💰":""))+'</button>';
     h+='</div>'; if(sd){ if(u<3) h+='<p class="muted" style="font-size:11px">'+FE("برای باز شدنِ درجه‌ی بعد، هم همین مرحله را در درجه‌ی پایین‌تر بگذران و هم خانِ هم‌شماره‌ی هفت‌خان را در همان درجه بشکن.","To unlock the next difficulty, clear this stage on the lower one and break the matching khan of the Haft Khan on that same difficulty.")+'</p>' } else if(u<3) h+='<p class="muted" style="font-size:11px">'+T("dLock")+'</p>';
     h+='<div style="font-size:20px">'+stars3(SAVE.stars[id]||0)+'</div>' }
   h+='<div class="menu">'+B("go",T("start"),"",'data-i="'+id+'"')+B(sd?"scity":(o?"city":"map"),T("back"),"ghost sm",sd?'data-i="'+sd.m+'"':(o?'data-i="'+o.m+'"':""))+'</div></div>'; showOv(h); if(window.__tutInfo) window.__tutInfo(id);
 }
 var _ms=window.__musStart; window.__musStart=function(lv){ _ms(typeof lv==="number"?(isSide(lv)?SIDE[sideOf(lv).m].th:(lv<NCAMP?MAPS[lv>>2].th:(lv===ID_GULF?6:3))):3) };
-function startLevel(i,diff){
+function startLevel(i,diff){ if(typeof i==="number"&&isSide(i)&&(diff||0)===3&&!sideImpOwned(sideOf(i).m)){ screenImpPay(sideOf(i).m,i); return }
   G.diff=(i==="custom"||isTrial(i))?2:(diff||0); G.dlgSeen={};
   if(G.lives<=0) G.lives=3; hideOv(); G.hold=0; state="play"; newWorld(i,0); inGameUI(true); applyHudLabels(); window.__musStart(i); var cbn=chBonus(); if(cbn.l>0&&G.lives<3+cbn.l) G.lives=3+cbn.l; hud(true); banner(lvLabel(i)); ac(); W.fromEd=(i==="custom"); if(window.__gdLevelStart&&typeof i==="number") window.__gdLevelStart(i);
 }
@@ -2353,7 +2353,7 @@ function screenShop(from){
   ov.querySelectorAll("canvas[data-hero]").forEach(function(c){ var g=c.getContext("2d"); g.imageSmoothingEnabled=true; drawFit(g,c,heroCanvas(c.getAttribute("data-hero"),true,"stand","base")) });
   var pc=$("potc"); if(pc) pc.getContext("2d").drawImage(potionCanvas(),0,0); if(window.__tutScreen) window.__tutScreen("shop");
 }
-var COINP=[{n:500,price:"۱۰ تومان",pe:"10 Toman"},{n:750,price:"۳۵ تومان",pe:"35 Toman"},{n:1000,price:"۶۰ تومان",pe:"60 Toman"}];
+var COINP=[{n:500,price:"۲۰٬۰۰۰ تومان",pe:"20,000 Toman"},{n:750,price:"۵۰٬۰۰۰ تومان",pe:"50,000 Toman"},{n:1000,price:"۸۰٬۰۰۰ تومان",pe:"80,000 Toman"}];
 function coinRow(c,i){ var fa=LANG==="fa";
   return '<div class="shopr"><span class="chd"><b>● '+N(c.n)+' '+(fa?"سکه":"coins")+'</b>'+(!PAID_OPEN?'':(CHAR_IAP?'':'<br><small style="opacity:.6">'+(fa?"حالت آزمایشی: رایگان":"Test mode: free")+'</small>'))+'</span>'+(PAID_OPEN?B("buyK",T("buy")+" — "+(fa?c.price:c.pe),"sm",'data-i="'+i+'"'):'<button class="btn sm ghost" disabled>🔒 '+(fa?"به‌زودی":"Soon")+' — '+(fa?c.price:c.pe)+'</button>')+'</div>' }
 function buyCoins(i){ if(!PAID_OPEN) return; var c=COINP[i];
@@ -2440,7 +2440,7 @@ ov.addEventListener("click",function(e){
   else if(a==="title") screenTitle(); else if(a==="map") screenMap(); else if(a==="lang") toggleLang(); else if(a==="snd"){ toggleMute(); screenTitle() }
   else if(a==="pickhero"){ SAVE.hero=h; writeSave(); goMap() }
   else if(a==="level"){ var n=i==="custom"?i:parseInt(i,10); startLevel(n,G.diff) }
-  else if(a==="city") screenStages(parseInt(i,10)); else if(a==="scity"){ var sm=parseInt(i,10); if(sideOwned(sm)) screenSideStages(sm); else screenSidePay(sm) } else if(a==="sidebuy") sideBuy(parseInt(i,10)); else if(a==="mapm"){ mapMode=t.getAttribute("data-mm"); screenMap() } else if(a==="info"){ selDiff=0; screenInfo(parseInt(i,10)) }
+  else if(a==="city") screenStages(parseInt(i,10)); else if(a==="scity"){ var sm=parseInt(i,10); if(sideOwned(sm)) screenSideStages(sm); else screenSidePay(sm) } else if(a==="sidebuy") sideBuy(parseInt(i,10)); else if(a==="impbuy") impBuy(parseInt(i,10),parseInt(h,10)); else if(a==="mapm"){ mapMode=t.getAttribute("data-mm"); screenMap() } else if(a==="info"){ selDiff=0; screenInfo(parseInt(i,10)) }
   else if(a==="diff"){ selDiff=parseInt(t.getAttribute("data-d"),10); if(curScreen) curScreen() }
   else if(a==="go") startLevel(parseInt(i,10),selDiff)
   else if(a==="resume") resume(); else if(a==="restart"){ var l=W.lv; startLevel(l,G.diff) }
@@ -2556,7 +2556,7 @@ window.__gdCard=enemyCard;
 function tut(key,steps,opt){ if(!gdOn()||SAVE.tut[key]) return; SAVE.tut[key]=1; writeSave(); setTimeout(function(){ if(!ov.hidden||state==="play") guide(steps,null,opt) },380) }
 var __welcomed=false;
 window.__tutTitle=function(){
-  if(__welcomed||!gdOn()) return; __welcomed=true;
+  if(SAVE.tut.welcomed||!gdOn()) return; SAVE.tut.welcomed=1; writeSave();
   setTimeout(function(){ if(ov.hidden) return; guide([
    {t:["درود بر تو ای جوان! منم رستمِ دستان، پورِ زال، جهان‌پهلوان. به نامِ یزدانِ پاک، به بازیِ «هفت‌خان» خوش آمدی.","Greetings, young one! I am Rostam, son of Zal, the World-Champion. In the name of God, welcome to Haft Khan."]},
    {t:["بدان که کاووس‌شاه در مازندران به بندِ دیوان گرفتار است و ایران‌زمین چشم به راهِ دلاوری. هر دکمه‌ای را که بزنی، همان‌جا برایت بازمی‌گویم.","King Kavus lies in chains in Mazandaran and Iran waits for a hero. Tap any button and I will tell you about it right there."]}
@@ -4370,30 +4370,35 @@ LMDRAW.alamut=function(g){ var i, by=BY, r=lmRnd(51);
   [[84,36],[250,24],[280,44]].forEach(function(b){ lmBird(g,b[0],b[1],4) }); lmSun(g) };
 
 /* ===== پرداخت مایکت: پل میان بازی و برنامه‌ی اندروید ===== */
-var IAPQ={};
+var IAPQ={}, IAPX="";
+function iapUn(k){ k=String(k||""); return k.indexOf(IAPX)===0?k.slice(IAPX.length):k }
 function iapSku(k){ return "hero_"+k }
 function iapGo(sku,cb){
-  if(window.AndroidIAP&&window.AndroidIAP.buy){ IAPQ[sku]=cb; try{ window.AndroidIAP.buy(sku) }catch(e){ delete IAPQ[sku]; cb(false) } }
+  if(window.AndroidIAP&&window.AndroidIAP.buy){ IAPQ[sku]=cb; try{ window.AndroidIAP.buy(IAPX+sku) }catch(e){ delete IAPQ[sku]; cb(false) } }
   else cb(true) /* در مرورگر (بدون اندروید) آزمایشی و رایگان */ }
-window.__IAP={ buySide:function(p,cb){ iapGo("side_"+(p+1),cb) }, buy:function(k,cb){ iapGo(iapSku(k),cb) }, buyCoins:function(i,cb){ iapGo("coins_"+COINP[i].n,cb) } };
+window.__IAP={ buyImp:function(m,cb){ iapGo("sideimp_"+(m+1),cb) }, buySide:function(p,cb){ iapGo("side_"+(p+1),cb) }, buy:function(k,cb){ iapGo(iapSku(k),cb) }, buyCoins:function(i,cb){ iapGo("coins_"+COINP[i].n,cb) } };
 function iapGrant(sku){
   if(sku.indexOf("coins_")===0){ SAVE.wallet=(SAVE.wallet||0)+parseInt(sku.slice(6),10) }
+  else if(sku.indexOf("sideimp_")===0){ SAVE.sideImp=SAVE.sideImp||{}; SAVE.sideImp[parseInt(sku.slice(8),10)-1]=1 }
   else if(sku.indexOf("side_")===0){ SAVE.side=SAVE.side||{}; SAVE.side[parseInt(sku.slice(5),10)-1]=1 }
   else if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 }
   writeSave(); try{ if(!ov.hidden&&state!=="play"&&typeof screenShop==="function"&&document.querySelector(".shopr")) screenShop() }catch(e){} }
-window.__iapResult=function(sku,ok){ var cb=IAPQ[sku]; delete IAPQ[sku]; if(cb) cb(!!ok); else if(ok) iapGrant(sku) };
-window.__iapOwned=function(csv){ String(csv||"").split(",").forEach(function(sku){ if(sku.indexOf("side_")===0){ SAVE.side=SAVE.side||{}; SAVE.side[parseInt(sku.slice(5),10)-1]=1 } if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 } }); writeSave() };
+window.__iapResult=function(sku,ok){ sku=iapUn(sku); var cb=IAPQ[sku]; delete IAPQ[sku]; if(cb) cb(!!ok); else if(ok) iapGrant(sku) };
+window.__iapOwned=function(csv){ String(csv||"").split(",").forEach(function(sku){ sku=iapUn(sku); if(sku.indexOf("sideimp_")===0){ SAVE.sideImp=SAVE.sideImp||{}; SAVE.sideImp[parseInt(sku.slice(8),10)-1]=1 } if(sku.indexOf("side_")===0){ SAVE.side=SAVE.side||{}; SAVE.side[parseInt(sku.slice(5),10)-1]=1 } if(sku.indexOf("hero_")===0){ SAVE.chars=SAVE.chars||{}; SAVE.chars[sku.slice(5)]=1 } }); writeSave() };
 
 /* ===== شهرهای فرعی: ۱، ۳، ۵ و ۷ پولی؛ ۲، ۴ و ۶ با خریدِ شهرِ پیش از خود رایگان ===== */
 function sidePaidOf(m){ return (m%2===0)?m:m-1 }
 function sideOwned(m){ return !!(SAVE.side&&SAVE.side[sidePaidOf(m)]) }
-function sideTag(m){ return (m%2===0)?FE("۵۰٬۰۰۰ تومان","50,000 T"):FE("🎁 رایگان","🎁 Free") }
-function sideNote(){ return '<div class="sub" style="font-size:12px;margin:0">'+FE("شهرهای ۱، ۳، ۵ و ۷ پولی‌اند (هرکدام ۵۰٬۰۰۰ تومان)؛ با خریدِ هر کدام، شهرِ بعدی‌اش رایگان بازی می‌شود.","Cities 1, 3, 5 and 7 are paid (50,000 Toman each). Buy one and the next city is free to play.")+'</div>' }
+var SIDEK=[50,0,75,0,90,0,60], IMPK=30;
+function tm(k){ return FE(N(k)+"٬۰۰۰ تومان",k+",000 Toman") }
+function sideImpOwned(m){ return !!(SAVE.sideImp&&SAVE.sideImp[m]) }
+function sideTag(m){ return (m%2===0)?tm(SIDEK[m]):FE("🎁 رایگان","🎁 Free") }
+function sideNote(){ return '<div class="sub" style="font-size:12px;margin:0">'+FE("شهرهای ۱، ۳، ۵ و ۷ پولی‌اند (۵۰، ۷۵، ۹۰ و ۶۰ هزار تومان)؛ با خریدِ هر کدام، شهرِ بعدی‌اش رایگان است. درجه‌ی «ناممکن» هر شهر جداگانه ۳۰ هزار تومان است.","Cities 1, 3, 5 and 7 are paid (50k, 75k, 90k and 60k Toman); buy one and the next city is free. The “Impossible” difficulty of each city is a separate 30k Toman.")+'</div>' }
 function screenSidePay(m){
   var p=sidePaidOf(m), fa=LANG==="fa", i=fa?0:1, nx=SIDE[p+1], h='<div class="box"><h3>'+FE("بازکردنِ شهر: ","Unlock: ")+SIDE[p].n[i]+'</h3>'+
-   '<div class="sub">'+FE("این شهر از «داستان‌های شاهنامه» پولی است: ۵۰٬۰۰۰ تومان.","This city of the Shahnameh Tales is paid: 50,000 Toman.")+'</div>'+
+   '<div class="sub">'+FE("این شهر از «داستان‌های شاهنامه» پولی است: "+tm(SIDEK[p])+".","This city of the Shahnameh Tales is paid: "+tm(SIDEK[p])+".")+'</div>'+
    (nx?'<div class="sub"><b>'+FE("با خریدِ این شهر، شهرِ بعدی («"+nx.n[0]+"») رایگان بازی می‌شود.","Buy this city and the next one (“"+nx.n[1]+"”) is free to play.")+'</b></div>':'')+
-   '<div class="row" style="margin-top:8px">'+B("sidebuy",FE("خرید — ۵۰٬۰۰۰ تومان","Buy — 50,000 Toman"),"",'data-i="'+p+'"')+B("map",T("back"),"ghost sm")+'</div></div>';
+   '<div class="row" style="margin-top:8px">'+B("sidebuy",FE("خرید — ","Buy — ")+tm(SIDEK[p]),"",'data-i="'+p+'"')+B("map",T("back"),"ghost sm")+'</div></div>';
   showOv(h) }
 function sideBuy(p){
   window.__IAP.buySide(p,function(ok){ if(ok){ SAVE.side=SAVE.side||{}; SAVE.side[p]=1; writeSave(); screenSideStages(p) } else screenSidePay(p) }) }
@@ -4401,6 +4406,15 @@ function sideBuy(p){
 /* ===== راهنمای رستم: فقط چیزهایی که از نامشان معلوم نیست ===== */
 window.__tutInfo=function(){}; window.__tutPause=function(){}; window.__gdImp=function(){};
 var __ts0=window.__tutScreen; window.__tutScreen=function(n){ if(n==="scores"||n==="hero"||n==="controls") return; if(__ts0) __ts0(n) };
+
+
+function screenImpPay(m,id){
+  var h='<div class="box"><h3>'+FE("درجه‌ی «ناممکن» — ","“Impossible” — ")+SIDE[m].n[LANG==="fa"?0:1]+'</h3>'+
+   '<div class="sub">'+FE("درجه‌ی «ناممکن» این شهر پولی است: "+tm(IMPK)+" (خریدِ یک‌باره، برای هر سه مرحله و خان).","The “Impossible” difficulty of this city is paid: "+tm(IMPK)+" (one-time, for all its stages and the boss).")+'</div>'+
+   '<div class="row" style="margin-top:8px">'+B("impbuy",FE("خرید — ","Buy — ")+tm(IMPK),"",'data-i="'+m+'" data-h="'+id+'"')+B("scity",T("back"),"ghost sm",'data-i="'+m+'"')+'</div></div>';
+  showOv(h) }
+function impBuy(m,id){
+  window.__IAP.buyImp(m,function(ok){ if(ok){ SAVE.sideImp=SAVE.sideImp||{}; SAVE.sideImp[m]=1; writeSave(); startLevel(id,3) } else screenImpPay(m,id) }) }
 
 /* پس‌پردازش برای همه‌ی بناها */
 (function(){ var old=lmCanvas; lmCanvas=function(k){ var S=Math.max(3,RSC), key=k+"_"+S; if(LMC[key]) return LMC[key]; var c=document.createElement("canvas"); c.width=LMW*S; c.height=LMH*S; var g=c.getContext("2d"); g.scale(S,S); g.lineCap="round"; g.lineJoin="round"; try{ LMDRAW[k](g); lmFinish(g) }catch(e){ if(window.console) console.log("lm",k,e&&e.message) } LMC[key]=c; return c }; window.__lmCanvas=lmCanvas })();

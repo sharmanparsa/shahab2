@@ -26,7 +26,8 @@ public class MainActivity extends Activity {
     private boolean iabReady = false;
     private static final List<String> SKUS = Arrays.asList(
         "hero_sohrab", "hero_siavash", "hero_esfandiyar", "coins_500", "coins_750", "coins_1000",
-        "side_1", "side_3", "side_5", "side_7");
+        "side_1", "side_3", "side_5", "side_7",
+        "sideimp_1", "sideimp_2", "sideimp_3", "sideimp_4", "sideimp_5", "sideimp_6", "sideimp_7");
 
     private boolean isCoin(String sku) { return sku != null && sku.startsWith("coins_"); }
 
