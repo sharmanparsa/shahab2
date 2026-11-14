@@ -70,6 +70,16 @@ public class MainActivity extends Activity {
 
     private class Bridge {
         @JavascriptInterface
+        public void putSave(String json) {
+            try { getSharedPreferences("save", MODE_PRIVATE).edit().putString("s", json).apply(); } catch (Throwable t) { }
+        }
+
+        @JavascriptInterface
+        public String getSave() {
+            try { return getSharedPreferences("save", MODE_PRIVATE).getString("s", ""); } catch (Throwable t) { return ""; }
+        }
+
+        @JavascriptInterface
         public void buy(final String sku) {
             runOnUiThread(() -> {
                 if (iab == null) { js("window.__iapResult('" + sku + "',false)"); return; }
