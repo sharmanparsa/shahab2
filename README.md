@@ -35,3 +35,18 @@
 
 ## v2.2
 - Full 6-12 frame walk cycles for all 7 bosses (lion, ogre, dragon, sorceress, giant, red demon, white demon).
+
+## v2.3
+- Dedicated jump/stand poses restored; run/walk frames feet-aligned with steady torso; ground-animal step bob; cleaned stray fragments.
+
+## v2.4
+- Painted sprites + walk/attack/hurt for 7 side-tale bosses; new viper-in-jar sprite.
+
+## v2.5
+- موسیقی فایل‌محور: menu، city1-7 (۳ مرحلهٔ عادی هر شهر)، boss1-7 (فقط نبرد باس) با کراس‌فید و لوپ. نقشهٔ فرعی و باس‌های فرعی هنوز موسیقی ساخته‌شدهٔ برنامه را دارند.
+
+## v2.6
+- ادامهٔ موسیقی از همان لحظه بعد از مکث (Pause → Resume).
+
+## v2.7
+- موسیقی نقشه‌های فرعی (smap1-7) و باس‌های فرعی (sboss1-7).
