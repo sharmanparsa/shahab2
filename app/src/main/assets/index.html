@@ -5293,6 +5293,150 @@ function lmGame(k){ var c=lmCanvas(k), key=k+"_"+c.width; if(LMG[key]) return LM
   ];
 })();
 
+/* ===== side4: بازسازی قلعه‌ی زابل (کوه خواجه) و آتشکده‌ی تخت سلیمان ===== */
+(function(){
+  function R(s){ return lmRnd(s) }
+  function noise(g,x,y,w,h,seed,n,a){ lmTex(g,x,y,w,h,seed,n,a) }
+  function clipPoly(g,pts,fn){ g.save(); g.beginPath(); g.moveTo(pts[0],pts[1]); for(var i=2;i<pts.length;i+=2) g.lineTo(pts[i],pts[i+1]); g.closePath(); g.clip(); fn(); g.restore() }
+  function fillPoly(g,pts,fill){ g.fillStyle=fill; g.beginPath(); g.moveTo(pts[0],pts[1]); for(var i=2;i<pts.length;i+=2) g.lineTo(pts[i],pts[i+1]); g.closePath(); g.fill() }
+  function glow(g,x,y,r,col,a){ g.fillStyle=rgr(g,x,y,1,r,[[0,"rgba("+col+","+a+")"],[1,"rgba("+col+",0)"]]); g.fillRect(x-r,y-r,r*2,r*2) }
+  function strata(g,x0,y0,x1,y1,seed,col){ var r=R(seed); for(var yy=y0;yy<y1;yy+=3+r()*5){ g.strokeStyle=col.replace("A",(0.08+r()*0.18).toFixed(2)); g.lineWidth=0.5+r()*0.8; g.beginPath(); g.moveTo(x0,yy+(r()-0.5)*2); g.lineTo(x1,yy+(r()-0.5)*3+1); g.stroke() } }
+  function fissures(g,x0,y0,x1,y1,seed,n,col){ var r=R(seed); for(var i=0;i<n;i++){ var sx=x0+r()*(x1-x0), sy=y0+r()*(y1-y0)*0.5, len=(y1-y0)*(0.2+r()*0.5); g.strokeStyle=col.replace("A",(0.1+r()*0.25).toFixed(2)); g.lineWidth=0.5+r()*1.2; g.beginPath(); g.moveTo(sx,sy); g.lineTo(sx+(r()-0.5)*8,sy+len*0.5); g.lineTo(sx+(r()-0.5)*12,sy+len); g.stroke() } }
+  function flameA(g,x,y,s){ poly(g,[x-3*s,y,x,y-10*s,x+3*s,y],"#FF8A20"); poly(g,[x-1.6*s,y,x,y-6*s,x+1.6*s,y],"#FFE27A") }
+  function steam(g,x,y,n,seed,a){ var r=R(seed); for(var i=0;i<n;i++){ ell(g,x+(r()-0.5)*18,y-i*7,5+r()*5+i*0.6,3+r()*3,"rgba(255,255,255,"+(a*(1-i/n))+")") } }
+  function layer(arr,id,fn){ for(var i=0;i<arr.length;i++) if(arr[i].id===id){ arr[i].fn=fn; return } }
+
+  /* ---- برجِ گرد با سایه‌ی استوانه‌ای ---- */
+  function round(g,x,by,w,h,c1,c2,seed,roof){
+    frect(g,x-w/2,by-h,w,h,lgr(g,x-w/2,0,x+w/2,0,[[0,c1],[0.35,c1],[1,c2]]));
+    lmBr(g,x-w/2,by-h,w,h,c1,c2,seed,3.4,7); g.fillStyle=lgr(g,x-w/2,0,x+w/2,0,[[0,"rgba(255,200,140,.28)"],[0.4,"rgba(255,200,140,0)"],[1,"rgba(20,6,10,.5)"]]); g.fillRect(x-w/2,by-h,w,h);
+    frect(g,x-w/2-1.5,by-h,w+3,3,"rgba(60,24,20,.55)"); lmMerl2(g,x-w/2-1.5,by-h,w+3,Math.max(4,Math.round(w/5)),"#C48A5E","#6A3A2C");
+    for(var i=0;i<3;i++){ frect(g,x-0.8,by-h*0.25-i*h*0.28,1.6,4.6,"#1A0A0C") }
+    if(roof){ poly(g,[x-w/2-1,by-h-7,x,by-h-7-w*0.62,x+w/2+1,by-h-7],"#8A3E30"); poly(g,[x,by-h-7-w*0.62,x+w/2+1,by-h-7,x+w*0.1,by-h-7],"rgba(30,8,8,.35)"); ln(g,x,by-h-7-w*0.62,x,by-h-14-w*0.62,0.9,"#3A1A12") } }
+
+  /* ================= ۱۴ زابل: قلعه‌ی کوه خواجه ================= */
+  layer(BGL[14],"far",function(g,P,H){
+    lmRange(g,P,H,14,46,16,"#C07066","#E8A486",0,"rgba(255,226,190,.4)");
+    wrapX(P,420,function(x){
+      var S=H-106; /* خط قله */
+      var pts=[x-196,H,x-184,H-22,x-152,H-40,x-128,H-60,x-100,H-70,x-84,H-86,x-66,S+6,x-60,S,x-30,S+3,x,S-1,x+34,S+2,x+60,S,x+68,S+8,x+86,H-84,x+104,H-70,x+132,H-58,x+160,H-38,x+190,H-20,x+198,H];
+      fillPoly(g,pts,lgr(g,x-196,0,x+198,0,[[0,"#7E4640"],[0.38,"#5A3234"],[0.75,"#3A1E26"],[1,"#2A161E"]]));
+      clipPoly(g,pts,function(){
+        strata(g,x-200,S-4,x+200,H,8,"rgba(20,8,10,A)"); noise(g,x-200,S-4,400,110,5,900,0.55); fissures(g,x-190,S,x+190,H,9,26,"rgba(12,4,8,A)");
+        g.fillStyle=lgr(g,x-196,0,x-60,0,[[0,"rgba(255,150,96,.42)"],[1,"rgba(255,150,96,0)"]]); g.fillRect(x-196,S-4,150,120);
+        for(var q=0;q<12;q++){ var rr=R(40+q); poly(g,[x-170+q*30,H-8,x-166+q*30+rr()*10,S+30+rr()*30,x-150+q*30,H-8],"rgba(18,6,10,.2)") } });
+      /* دیوار پلکانیِ شیب‌دار از قله تا دامنه */
+      [[-1],[1]].forEach(function(d){ var d0=d[0];
+        for(var i=0;i<5;i++){ var wx=x+d0*(60+i*13), wy=S+4+i*11; ln(g,wx,wy,wx+d0*13,wy+11,5.2,"#5C2E2C"); ln(g,wx,wy-2.4,wx+d0*13,wy+8.6,1,"#A06A4A"); if(i%2===0){ frect(g,wx+d0*6-4,wy-7+i*0.6,8,10,"#6E3A34"); frect(g,wx+d0*6-4.5,wy-9+i*0.6,9,2.2,"#8A5240") } } });
+      /* پی‌ِ صخره‌ای زیر قلعه */
+      fillPoly(g,[x-70,S+10,x-62,S-6,x-30,S-3,x,S-7,x+34,S-4,x+62,S-6,x+72,S+10],"#4A2A2E");
+      /* بدنه‌ی اصلی: دیوار بلند با پشت‌بند */
+      var by=S+4; lmBr(g,x-62,by-30,124,34,"#C48A5E","#7A4A34",210,3.4,8); noise(g,x-62,by-30,124,34,211,260,0.5);
+      g.fillStyle=lgr(g,0,by-30,0,by+4,[[0,"rgba(255,200,140,.18)"],[1,"rgba(30,8,10,.45)"]]); g.fillRect(x-62,by-30,124,34);
+      for(var b=0;b<9;b++){ var bx=x-58+b*14.4; frect(g,bx,by-30,3.4,34,"rgba(60,24,20,.42)"); frect(g,bx+3.4,by-30,1,34,"rgba(255,210,160,.16)") }
+      lmMerl2(g,x-64,by-30,128,17,"#CC9468","#7E4E38"); frect(g,x-64,by-31,128,2,"rgba(255,226,190,.35)");
+      for(var s2=0;s2<8;s2++) frect(g,x-54+s2*15.6,by-18,1.8,7,"#180A0C");
+      /* برج‌های گوشه */
+      round(g,x-62,by+2,19,58,"#C88E62","#6C3C2E",220,true); round(g,x+62,by+2,19,58,"#C88E62","#6C3C2E",221,true);
+      round(g,x-34,by-26,13,34,"#CC9468","#7A4A38",222,false); round(g,x+34,by-26,13,34,"#CC9468","#7A4A38",223,false);
+      /* ارگ پشتی با گنبد */
+      lmBr(g,x-26,by-64,52,36,"#D09A6C","#82523A",224,3.4,8); noise(g,x-26,by-64,52,36,225,160,0.45);
+      g.fillStyle=lgr(g,x-26,0,x+26,0,[[0,"rgba(255,200,140,.22)"],[1,"rgba(24,6,10,.4)"]]); g.fillRect(x-26,by-64,52,36); lmMerl2(g,x-28,by-64,56,10,"#D4A072","#8A5A40");
+      lmDome2(g,x,by-64,17,20,"#C0805A","#6A3A30","#F0C090",{ribs:6,fin:false}); ln(g,x,by-84,x,by-93,1.1,"#3A1A12"); poly(g,[x,by-93,x+9,by-90,x,by-87],"#C8323C");
+      for(var w3=0;w3<3;w3++) lmArch2(g,x-14+w3*14,by-40,5,12,"rgba(255,170,90,.85)");
+      /* دروازه‌ی بزرگ (ایوان) */
+      lmBr(g,x-17,by-44,34,48,"#D8A274","#8A5A42",226,3.4,8); lmArch2(g,x,by+2,22,36,"#2A1214"); lmArch2(g,x,by+2,17,31,"#120608"); glow(g,x,by-8,20,"255,140,80",0.3);
+      lmArch2(g,x,by-30,5,9,"rgba(255,180,100,.9)"); frect(g,x-19,by-46,38,3,"#C48A5E"); lmMerl2(g,x-19,by-46,38,7,"#D8A274","#8A5A42");
+      lmArch2(g,x-29,by-6,6,14,"rgba(255,160,90,.7)"); lmArch2(g,x+29,by-6,6,14,"rgba(255,160,90,.7)");
+      /* سنگ‌ریزه‌ها و گرد و غبار پای قلعه */
+      for(var rk=0;rk<14;rk++){ var rr2=R(300+rk); ell(g,x-70+rk*10.5,S+9+rr2()*6,3+rr2()*3,1.6+rr2()*1.4,"rgba(40,18,18,.65)") }
+      glow(g,x,S+14,96,"244,160,126",0.22);
+      for(var fl=0;fl<2;fl++) { poly(g,[x-62+fl*124,by-66,x-62+fl*124+11,by-63,x-62+fl*124,by-60],"#C8323C"); ln(g,x-62+fl*124,by-66,x-62+fl*124,by-80,1,"#2A1410") }
+    });
+    var r=R(14); for(var b=0;b<10;b++) lmBird(g,60+b*70+r()*20,H-150-r()*60,3+r()*1.4);
+    lmFog(g,P,H-70,70,0.28,"244,160,126") });
+
+  /* ================= ۱۳ تخت سلیمان: آتشکده‌ی آذرگشنسب ================= */
+  layer(BGL[13],"mid",function(g,P,H){
+    wrapX(P,250,function(x){
+      /* دریاچه با بازتاب */
+      g.fillStyle=lgr(g,0,H-26,0,H,[[0,"#62D0D4"],[1,"#168296"]]); g.beginPath(); g.ellipse(x,H-10,196,13,0,0,TP); g.fill();
+      g.save(); g.beginPath(); g.ellipse(x,H-10,196,13,0,0,TP); g.clip(); for(var rf=0;rf<10;rf++){ g.fillStyle="rgba(200,220,236,"+(0.2-rf*0.015)+")"; g.fillRect(x-30+Math.sin(rf*1.7)*3,H-22+rf*1.6,60+rf*3,1.2) } g.restore();
+      g.strokeStyle="rgba(255,255,255,.32)"; g.lineWidth=0.8; for(var w=0;w<14;w++){ g.beginPath(); g.moveTo(x-170+w*26,H-12+(w%3)*4); g.lineTo(x-150+w*26,H-12+(w%3)*4); g.stroke() }
+      /* حصار بیضی با برج‌های پشت‌بندی */
+      lmStone(g,x-190,H-72,380,50,"#9AA6B2","#5E6C7C",170,8,18); noise(g,x-190,H-72,380,50,4,520,0.5); lmMerl2(g,x-194,H-72,388,38,"#A8B4C0","#6A788A"); frect(g,x-190,H-74,380,2,"rgba(255,255,255,.55)");
+      for(var m=0;m<38;m++) frect(g,x-192+m*10.2,H-79,8.6,1.6,"rgba(248,252,255,.9)");
+      for(var k=0;k<14;k++){ lmArch2(g,x-176+k*27,H-22,9,28,"rgba(14,22,32,.8)"); frect(g,x-181+k*27,H-70,2,46,"rgba(30,44,60,.22)") }
+      [[-206],[206]].forEach(function(o){ lmStone(g,x+o[0]-18,H-112,36,92,"#A8B4C0","#66748A",175,8,16); noise(g,x+o[0]-18,H-112,36,92,6,160,0.5); lmMerl2(g,x+o[0]-20,H-112,40,5,"#B4C0CC","#728096"); lmArch2(g,x+o[0],H-22,10,38,"#0E1620"); ell(g,x+o[0],H-114,22,3,"rgba(248,252,255,.95)") });
+      /* ---- معبد: سکوی پلکانی ---- */
+      lmStone(g,x-72,H-30,144,8,"#B4C0CC","#6E7C8E",300,4,14); lmStone(g,x-62,H-38,124,8,"#BAC6D2","#74829A",301,4,14); frect(g,x-72,H-31,144,1.6,"rgba(255,255,255,.7)"); frect(g,x-62,H-39,124,1.6,"rgba(255,255,255,.7)");
+      /* چهارطاقی: بدنه‌ی مربع آجری */
+      var bx=x-36, bw=72, bt=H-112, bb=H-38;
+      lmBr(g,bx,bt,bw,bb-bt,"#B8A890","#74665A",310,4,10); noise(g,bx,bt,bw,bb-bt,311,420,0.5);
+      g.fillStyle=lgr(g,bx,0,bx+bw,0,[[0,"rgba(255,255,255,.18)"],[0.55,"rgba(255,255,255,0)"],[1,"rgba(20,26,40,.42)"]]); g.fillRect(bx,bt,bw,bb-bt);
+      [[bx-5],[bx+bw-1]].forEach(function(o,i){ lmBr(g,o[0],bt+2,6,bb-bt-2,"#C4B49C","#7C6E60",312+i,4,8); frect(g,o[0]-1,bt+2,8,3,"#D4C8B4") });
+      frect(g,bx-6,bt-2,bw+12,4,"#D8CEBA"); frect(g,bx-6,bt+2,bw+12,1.4,"rgba(40,30,20,.45)"); /* قاب بالا */
+      for(var t=0;t<14;t++) poly(g,[bx-4+t*5.4,bt-2,bx-1.3+t*5.4,bt-6.4,bx+1.4+t*5.4,bt-2],"#DCD2BE"); /* نواری پله‌ای گچ‌بری */
+      lmArch2(g,x,bb,40,66,"#0A1018"); lmArch2(g,x,bb,32,58,"#05080E"); frect(g,x-21,bb-70,42,2,"#E0D6C2");
+      glow(g,x,bb-26,44,"255,150,70",0.4);
+      lmArch2(g,x-28,bb-18,8,26,"rgba(12,20,32,.85)"); lmArch2(g,x+28,bb-18,8,26,"rgba(12,20,32,.85)");
+      lmArch2(g,x,bt+14,10,16,"rgba(255,200,120,.35)");
+      /* آتش مقدس */
+      frect(g,x-9,bb-16,18,16,"#8E9CAA"); frect(g,x-12,bb-18,24,3,"#B6C2CE"); flameA(g,x,bb-18,2.8); glow(g,x,bb-28,30,"255,170,80",0.5);
+      /* شانه‌ی گوشواره (squinch) → استوانه‌ی گنبد */
+      fillPoly(g,[bx-6,bt-2,bx+4,bt-14,bx+14,bt-14,bx+14,bt-2],"#A89E8C"); fillPoly(g,[bx+bw+6,bt-2,bx+bw-4,bt-14,bx+bw-14,bt-14,bx+bw-14,bt-2],"#8C8478");
+      var dw=44; lmBr(g,x-dw/2,bt-26,dw,24,"#BCB09A","#7A6E60",313,4,9); g.fillStyle=lgr(g,x-dw/2,0,x+dw/2,0,[[0,"rgba(255,255,255,.2)"],[1,"rgba(16,20,34,.45)"]]); g.fillRect(x-dw/2,bt-26,dw,24);
+      for(var wi=0;wi<6;wi++) lmArch2(g,x-dw/2+4+wi*7.2,bt-5,3.4,12,"rgba(18,26,40,.9)");
+      frect(g,x-dw/2-2,bt-28,dw+4,3,"#DCD2BE");
+      lmDome2(g,x,bt-27,dw/2+3,36,"#B8C4D2","#6E7E92","#EEF4FA",{ribs:9,fin:false,tile:60}); ell(g,x,bt-60,12,2.2,"rgba(248,252,255,.9)");
+      ln(g,x,bt-63,x,bt-80,1.4,"#8A98A8"); poly(g,[x-6,bt-70,x,bt-76,x+6,bt-70],"#6E7C8C"); ell(g,x,bt-82,2,2,"#E8C860");
+      /* برف روی سکو و بام */
+      ell(g,x-24,bt-3,18,2.4,"rgba(250,253,255,.9)"); ell(g,x+24,bt-3,18,2.4,"rgba(250,253,255,.9)"); ell(g,x,H-39,60,2,"rgba(250,253,255,.9)");
+      for(var ic=0;ic<10;ic++){ var ix=bx+2+ic*7; poly(g,[ix,bt+1,ix+1.4,bt+1,ix+0.7,bt+4+(ic%3)*2],"rgba(206,232,248,.9)") }
+      /* بخار و نقش‌پایه‌ی چشمه */
+      steam(g,x-110,H-14,9,31,0.5); steam(g,x+120,H-14,10,37,0.45); steam(g,x-40,H-14,7,41,0.38);
+      for(var sm=0;sm<6;sm++) ell(g,x+Math.sin(sm)*4+sm,bt-90-sm*10,3+sm*1.2,3.4+sm,"rgba(140,150,160,"+(0.22-sm*0.03)+")");
+      [[-130,40],[-112,26],[130,34],[150,22],[-92,32],[96,28]].forEach(function(c,i){ lmCol(g,x+c[0],H-12,c[1]+20,7,"#C4CED8","#7E8C9C",i%2===0) });
+    });
+    wrapX(P,660,function(x){ /* غار افراسیاب */
+      var pts=[x-96,H,x-90,H-60,x-70,H-110,x-40,H-132,x-6,H-122,x+26,H-148,x+62,H-118,x+86,H-70,x+98,H]; fillPoly(g,pts,lgr(g,x-96,0,x+98,0,[[0,"#7C8898"],[0.55,"#4E5A6C"],[1,"#2A3444"]]));
+      clipPoly(g,pts,function(){ strata(g,x-100,H-150,x+100,H,6,"rgba(20,28,40,A)"); fissures(g,x-96,H-148,x+98,H,7,22,"rgba(10,16,26,A)"); noise(g,x-100,H-150,200,150,9,520,0.5);
+        for(var q=0;q<7;q++){ g.strokeStyle="rgba(240,248,255,.7)"; g.lineWidth=1.4+q%2; g.beginPath(); g.moveTo(x-84+q*26,H-130+(q%3)*14); g.lineTo(x-80+q*26,H-60+(q%2)*20); g.stroke() } });
+      poly(g,[x-70,H-110,x-40,H-132,x-6,H-122,x-30,H-112,x-50,H-104],"rgba(255,255,255,.9)"); poly(g,[x+26,H-148,x+62,H-118,x+52,H-114,x+34,H-134],"rgba(255,255,255,.9)");
+      fillPoly(g,[x-34,H,x-38,H-34,x-28,H-62,x,H-70,x+30,H-60,x+38,H-32,x+34,H],"#05080F"); glow(g,x,H-30,40,"130,110,230",0.4);
+      for(var tt=0;tt<9;tt++) poly(g,[x-30+tt*7.5,H-66+Math.abs(tt-4)*1.6,x-26+tt*7.5,H-48-(tt%3)*4,x-22+tt*7.5,H-66+Math.abs(tt-4)*1.6],"#B4D4E8");
+      ell(g,x-9,H-32,2,1.6,"rgba(255,70,70,.95)"); ell(g,x+9,H-32,2,1.6,"rgba(255,70,70,.95)"); glow(g,x-9,H-32,8,"255,60,60",0.5); glow(g,x+9,H-32,8,"255,60,60",0.5);
+      for(var sk=0;sk<5;sk++){ ell(g,x-30+sk*14,H-3,4,3,"#E8E0CC"); ell(g,x-30+sk*14,H-4,1,1,"#1A1018") }
+      lmSnowPine(g,x-118,H-2,70,3); lmSnowPine(g,x+124,H-2,64,6) });
+    [[40],[470]].forEach(function(p,i){ wrapX(P,p[0],function(x){ lmSnowPine(g,x,H-2,64-i*8,20+i) }) });
+    lmFog(g,P,H-40,40,0.3,"236,244,250") });
+})();
+
+/* ===== hero3: اصلاح اندازه/ایستاده/بالا‌پایین‌شدن سهراب، سیاوش، اسفندیار ===== */
+var __hc3=heroCanvas, HFIX={
+  sohrab:{st:"m0",walk:[5,7,7,0,3,3],run:[2,4,0]},
+  siavash:{st:"m1",al:0.7,walk:[11,18,7,0,11,4],run:[29,24,5,0,16,22,3,4]},
+  esfandiyar:{st:"m0",walk:[1,7,0,3,1,0,2],run:[10,14,15,0,10,11,8]}
+}, HC3={};
+heroCanvas=function(hero,big,frame,variant){
+  var F=HFIX[hero], HR=SPRD.hr&&SPRD.hr[hero];
+  if(!F||!HR) return __hc3(hero,big,frame,variant);
+  if(frame==="stand") frame=F.st;
+  var rm=/^([rm])(\d+)$/.exec(frame); if(!rm) return __hc3(hero,big,frame,variant);
+  var isR=rm[1]==="r", set=isR?HR.run:HR.walk, tops=isR?F.run:F.walk, ii=parseInt(rm[2],10)%set.length, o2=set[ii];
+  if(!sprOk(o2)||!SPRD.h[hero]||!sprOk(SPRD.h[hero][0])) return __hc3(hero,big,"stand",variant);
+  var key=hero+(big?"B":"S")+frame+variant+"v4"; if(HC3[key]) return HC3[key];
+  if(variant.indexOf("star")===0){ var base=heroCanvas(hero,big,frame,"base"), hue=parseInt(variant.slice(4),10)*30;
+    var o3=document.createElement("canvas"); o3.width=base.width; o3.height=base.height; var g3=o3.getContext("2d"); g3.filter="hue-rotate("+hue+"deg) saturate(1.9) brightness(1.2)"; g3.drawImage(base,0,0);
+    o3._ox=base._ox; o3._oy=base._oy; HC3[key]=o3; return o3 }
+  var sorted=tops.slice().sort(function(a,b){return a-b}), ref=sorted[sorted.length>>1];
+  var S=VSC, hh=big?46:28, TH=big?hh*1.18:hh*1.46, k=TH/(o2.hh-ref);
+  var shift=(F.al||0.5)*(tops[ii]-ref)*k;
+  var CW=Math.ceil((o2.w*k/2+2)*2), CH=Math.ceil(Math.max(TH,o2.hh*k))+8;
+  var c=document.createElement("canvas"); c.width=CW*S; c.height=CH*S; var g=c.getContext("2d"); g.imageSmoothingEnabled=true; g.imageSmoothingQuality="high";
+  g.drawImage(o2.im,(CW/2-o2.w*k/2)*S,(CH-4-o2.hh*k-shift)*S,o2.w*k*S,o2.hh*k*S);
+  c._ox=(CW/2-10)*S; c._oy=(CH-4-hh)*S; HC3[key]=c; return c };
+
 })();
 </script>
 
